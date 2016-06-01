@@ -186,7 +186,10 @@ function newgame(game){
 	var a=rndint(11,39);
 	var b=rndint(11,39);
 	game.enemy[add_monster]={img: img_motherplant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-	text(add_monster);
+	add_monster++;
+	a=rndint(11,39);
+	b=rndint(11,39);
+	game.enemy[add_monster]={img: img_motherplant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
 	add_monster++;
 
     for(var y=10; y<15; y++){
