@@ -418,6 +418,10 @@ function logic(game){
 				var ok=true;
 				game.pos.x+=a;
 				game.pos.y+=b;
+				if(game.map[game.pos.x][game.pos.y][0]=="img_stairs"){
+					text("Вы выиграли!!! Нажмите ENTER чтобы играть снова!");
+					gameover();
+				}
 				if(game.map[game.pos.x][game.pos.y][2]!="empty"){
 					for (var i in game.inv){
 						if(game.inv[i].name=="slot" && ok){
