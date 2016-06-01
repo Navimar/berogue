@@ -126,6 +126,7 @@ function init(){
 function newgame(game){
 	gameovered=false;
 	add_monster=0;
+	game.hp=10;
 
 	for(var y=0; y<50; y++){
 		for(var x=0; x<50; x++){
@@ -542,6 +543,7 @@ function logic(game){
 	}
 
 	function enemyturn(){
+		text("--------------");
 		function move(a,b){
 			var nx=enemy.x+a;
 			var ny=enemy.y+b;
@@ -558,15 +560,15 @@ function logic(game){
 			 	// }
 
 			 }
-			stamp=0;
-			enemy.x=nx;
-			enemy.y=ny;
-
-
-			if(enemy.x==game.pos.x && enemy.y==game.pos.y){
-				text("Ваш герой обезглавлен огромным ежиком...")
-				gameover(game, false);
+			 enemy.x=nx;
+			 enemy.y=ny;
+			 if(enemy.x==game.pos.x && enemy.y==game.pos.y){
+			 	text("Героя серьезно укусили");
+				hpMinus(1, game);
+				killEnemy(enemy.x,enemy.y,game);
+				// gameover(game, false);
 			}
+			stamp=0;
 		}
 		function amISeeHero(v){
 
@@ -709,4 +711,12 @@ function enemyInPos(x,y,game){
 		}
 	}
 	return r;
+}
+
+function hpMinus(q,game){
+	game.hp-=q;
+	if (game.hp<=0){
+		text("Герой растерзан... "+game.hp);
+		gameover(game,false);
+	}
 }
