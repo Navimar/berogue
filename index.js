@@ -422,7 +422,7 @@ function logic(game){
 				var ok=true;
 				game.pos.x+=a;
 				game.pos.y+=b;
-				if(game.map[game.pos.x][game.pos.y][0]=="img_stairs"){
+				if(game.map[game.pos.x][game.pos.y][0]==img_stairs){
 					text("Вы выиграли!!! Нажмите ENTER чтобы играть снова!");
 					gameover();
 				}
@@ -465,7 +465,7 @@ function logic(game){
 					action(a,b,"move");
 				}
 			}else{
-				text("Даже не хочу думать, чтобы будет если из съесть.");
+				text("Даже не хочу думать, что будет если съесть эти семена.");
 			}
 		}
 		key=0;
