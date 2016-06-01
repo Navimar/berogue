@@ -24,8 +24,8 @@ const img_beheaded= new Image();
 img_beheaded.src = 'img/beheaded.png';
 const img_from = new Image();
 img_from.src = 'img/from.png';
-const img_sokoban = new Image();
-img_sokoban.src = 'img/sokoban.png';
+const img_brick = new Image();
+img_brick.src = 'img/brick.png';
 const img_box = new Image();
 img_box.src = 'img/box.png';
 
@@ -34,12 +34,14 @@ const item_move={name:"move", img:img_move, text:"Старые ботинки, W
 const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, найдите полезные предметы чтобы заполнить его."};
 
 const item_spear={name:"spear", img:img_spear, text:"Копье гоплита, метните его во врага!"};
-const item_sokoban={name:"sokoban", img:img_sokoban, text:"Пушка сокобана, стреляет коробкой."};
+const item_brick={name:"brick", img:img_brick, text:"Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."};
 
 var dh=0;
 const vision=9;
 
 var gameovered=false;
+var justmoved=false;
+
 var stamp=0;
 var key=0;
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
@@ -150,7 +152,7 @@ function newgame(game){
 	}
 
 	for(e in game.enemy){
-		if(game.enemy[e].x<14 && game.enemy[e].x<14){
+		if(game.enemy[e].x<14 && game.enemy[e].y<14){
 			killEnemy(game.enemy[e].x,game.enemy[e].y,game);
 		}
 	}
@@ -171,7 +173,7 @@ function newgame(game){
 	}
 	game.inv[0]=item_move;
 	game.inv[1]=item_spear;
-	game.inv[2]=item_sokoban;
+	game.inv[2]=item_brick;
 	
 	return game;
 }
@@ -398,23 +400,25 @@ function logic(game){
 		}
 	}
 
+	function canMove(a,b){
+		if(game.map[game.pos.x+a][game.pos.y+b][1]!="empty"){
+					text("Препятствие!");
+					return false;
+				}
+			for (var e of game.enemy){		
+				if(game.pos.x+a==e.x && game.pos.y+b==e.y){
+					text("Нельзя наступать на ёжиков!");
+					return false;
+					}
+			}
+		return true;
+	}
 	function action(a,b,act){
 		var x = game.pos.x;
 		var y = game.pos.y;
 		
 		if (act==="move"){	
-			var ok= true;
-			if(game.map[x+a][y+b][1]!="empty"){
-					text("Препятствие!");
-					ok=false;
-				}
-			for (var e of game.enemy){		
-				if(game.pos.x+a==e.x && game.pos.y+b==e.y){
-					text("Нельзя наступать на ёжиков!");
-					ok=false;
-					}
-			}
-			if(ok){
+			if(canMove(a,b)){
 				var ok=true;
 				game.pos.x+=a;
 				game.pos.y+=b;
@@ -432,6 +436,7 @@ function logic(game){
 					game.map[game.pos.x][game.pos.y][2]="empty";
 				}
 				enemyturn();
+				justmoved = true;
 			}
 		}
 		if (act==="spear"){
@@ -452,12 +457,19 @@ function logic(game){
 			enemyturn();
 			}
 		}
-		if (act=="sokoban"){
-			text("сокобан!");
-			game.map[x][y][1]=img_box;
-			game.select=0;
+		if (act=="brick"){
+			if(!(a==0 && b==0)){
+				if(canMove(a,b)){
+					text("Пожалуй приберегу несколько на строительство дома.");
+					game.map[x][y][1]=img_wall;
+					action(a,b,"move");
+				}
+			}else{
+				text("Даже не хочу думать, чтобы будет если из съесть.");
+			}
 		}
 		key=0;
+		// return "none";
 	}
 
 	function enemyturn(){
@@ -473,12 +485,11 @@ function logic(game){
 			 	if(game.map[nx][ny][1]!="empty"){
 			 		nx=enemy.x;
 			 		ny=enemy.y;
+			 		text("еж топчит стену!");
 			 	}
 
 			 }
 			stamp=0;
-			enemy.fromx=enemy.x;
-			enemy.fromy=enemy.y;
 			enemy.x=nx;
 			enemy.y=ny;
 
@@ -489,6 +500,8 @@ function logic(game){
 			}
 		}
 		for (var enemy of game.enemy){
+			enemy.fromx=enemy.x;
+			enemy.fromy=enemy.y;
 			var px = enemy.x-game.pos.x+4;
 			var py = enemy.y-game.pos.y+4;
 			if(px>=0 && py>=0 && px<=9 && py<=9){
