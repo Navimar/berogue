@@ -34,6 +34,8 @@ const img_plant = new Image();
 img_plant.src = 'img/plant.png';
 const img_motherplant = new Image();
 img_motherplant.src = 'img/motherplant.png';
+const img_stay = new Image();
+img_stay.src = 'img/stay.png';
 
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
@@ -41,6 +43,7 @@ const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, �
 
 const item_spear={name:"spear", img:img_spear, text:"Копье гоплита, метните его во врага!"};
 const item_brick={name:"brick", img:img_brick, text:"Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."};
+const item_stay={name:"stay", img:img_stay, text:"Палочка проростания, превращает в растение"};
 
 var dh=0;
 const vision=9;
@@ -213,7 +216,14 @@ function newgame(game){
 	}
 	game.inv[0]=item_move;
 	game.inv[1]=item_spear;
-	game.inv[2]=item_brick;
+	// game.inv[2]=item_stay;
+	// game.inv[3]=item_brick;
+	a=rndint(11,39);
+	b=rndint(11,39);
+	game.map[a][b][2] = item_brick;
+	a=rndint(11,39);
+	b=rndint(11,39);
+	game.map[a][b][2] = item_stay;
 	
 	return game;
 }
@@ -240,7 +250,11 @@ function drawimg(img,x,y){
 
 function imfp(x,y,z,game){
 	if (game.map[x][y][z] != "empty"){
-		return game.map[x][y][z];
+		if(z<2){
+			return game.map[x][y][z];
+		}else{
+			return game.map[x][y][z].img;
+		}
 	} else return "empty";
 }
 
@@ -468,7 +482,7 @@ function logic(game){
 				if(game.map[game.pos.x][game.pos.y][2]!="empty"){
 					for (var i in game.inv){
 						if(game.inv[i].name=="slot" && ok){
-							game.inv[i]=item_spear;
+							game.inv[i]=game.map[game.pos.x][game.pos.y][2];
 							ok=false;
 						}
 					}
@@ -488,7 +502,7 @@ function logic(game){
 						killEnemy(x+a*i,y+b*i,game);
 						text("Вы пронзили ежа копьем!")
 						game.inv[game.select]=item_slot;
-						game.map[x+a*i][y+b*i][2]=img_spear;
+						game.map[x+a*i][y+b*i][2]=item_spear;
 						ok=false;
 						game.select=0;
 					}
@@ -505,6 +519,22 @@ function logic(game){
 				}
 			}else{
 				text("Даже не хочу думать, что будет если съесть эти семена.");
+			}
+		}
+		if (act=="stay"){
+			if(a==0 && b==0){
+				text("Я не хочу стать растением!")
+			}else{
+				var ok=true;
+				for(var i=1; i<5; i++){
+					if(enemyInPos(x+a*i,y+b*i,game)!=0 && ok){
+						enemyInPos(x+a*i,y+b*i,game).img=img_plant;
+						text("Даже поливать не нужно!");
+						ok=false;
+						game.select=0;
+					}
+				}
+			enemyturn();
 			}
 		}
 		key=0;
@@ -675,8 +705,7 @@ function enemyInPos(x,y,game){
 	var r=0;
 	for (var e of game.enemy){
 		if (e.x==x && e.y==y){
-			r=game.enemy;
-			
+			r=e;
 		}
 	}
 	return r;
