@@ -30,6 +30,10 @@ const img_box = new Image();
 img_box.src = 'img/box.png';
 const img_ghost = new Image();
 img_ghost.src = 'img/ghost.png';
+const img_plant = new Image();
+img_plant.src = 'img/plant.png';
+const img_motherplant = new Image();
+img_motherplant.src = 'img/motherplant.png';
 
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
@@ -42,7 +46,7 @@ var dh=0;
 const vision=9;
 
 var gameovered=false;
-var justmoved=false;
+var add_monster = 0;
 
 var stamp=0;
 var key=0;
@@ -118,6 +122,7 @@ function init(){
 
 function newgame(game){
 	gameovered=false;
+	add_monster=0;
 
 	for(var y=0; y<50; y++){
 		for(var x=0; x<50; x++){
@@ -147,9 +152,8 @@ function newgame(game){
 	}
 
 	game.enemy=[];
-	var add_monster = 0;
 	var ghosts=15;
-	for (j=0;j<40;j++){
+	for (j=0;j<45;j++){
 		var a=rndint(11,39);
 		var b=rndint(11,39);
 		game.enemy[add_monster]={img: img_hedgehog, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
@@ -179,6 +183,11 @@ function newgame(game){
 		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
 		add_monster++;
 	}
+	var a=rndint(11,39);
+	var b=rndint(11,39);
+	game.enemy[add_monster]={img: img_motherplant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+	text(add_monster);
+	add_monster++;
 
     for(var y=10; y<15; y++){
 		for(var x=10; x<15; x++){
@@ -534,6 +543,40 @@ function logic(game){
 			enemy.fromy=enemy.y;
 			var px = enemy.x-game.pos.x+4;
 			var py = enemy.y-game.pos.y+4;
+			if(enemy.img==img_motherplant){
+				var a=rndint(1,49);
+				var b=rndint(1,49);
+				text("Герой слышит вой новорожденного плотоядного растения ");
+				if(!((a==game.pos.x || a==game.pos.x-1|| a==game.pos.x+1) && (b==game.pos.y || b==game.pos.y-1|| b==game.pos.y+1))){
+					if(game.map[a][b][1]=="empty"){
+						game.enemy[add_monster]={img: img_plant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+						add_monster++;
+					}
+				}
+				
+				for (var a=-1;a<=1;a++){	
+					if(enemy.x+a==game.pos.x && enemy.y==game.pos.y){
+						move(a,0);	
+					}
+				}
+				for (var b=-1;b<=1;b++){
+					if(enemy.x==game.pos.x && enemy.y+b==game.pos.y){
+						move(0,b);	
+					}
+				}	
+			}
+			if(enemy.img==img_plant){
+				for (var a=-1;a<=1;a++){	
+					if(enemy.x+a==game.pos.x && enemy.y==game.pos.y){
+						move(a,0);	
+					}
+				}
+				for (var b=-1;b<=1;b++){
+					if(enemy.x==game.pos.x && enemy.y+b==game.pos.y){
+						move(0,b);	
+					}
+				}	
+			}
 			if(enemy.img==img_hedgehog){
 				if(px>=0 && py>=0 && px<=9 && py<=9){
 					if(!game.fow[px][py]){
@@ -597,6 +640,7 @@ function killEnemy(x,y,game){
 		for (var e in game.enemy){
 			if (game.enemy[e].x==x && game.enemy[e].y==y){
 				game.enemy.splice(e, 1);
+				add_monster--;
 			}
 		}
 	}
