@@ -28,6 +28,8 @@ const img_brick = new Image();
 img_brick.src = 'img/brick.png';
 const img_box = new Image();
 img_box.src = 'img/box.png';
+const img_ghost = new Image();
+img_ghost.src = 'img/ghost.png';
 
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
@@ -145,21 +147,47 @@ function newgame(game){
 	}
 
 	game.enemy=[];
-	for (j=0;j<74;j++){
+	var add_monster = 0;
+	var ghosts=15;
+	for (j=0;j<40;j++){
 		var a=rndint(11,39);
 		var b=rndint(11,39);
-		game.enemy[j]={img: img_hedgehog, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+		game.enemy[add_monster]={img: img_hedgehog, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+		add_monster++;
 	}
-
-	for(e in game.enemy){
-		if(game.enemy[e].x<14 && game.enemy[e].y<14){
-			killEnemy(game.enemy[e].x,game.enemy[e].y,game);
-		}
+	for (j=0;j<ghosts;j++){
+		var a=rndint(6,10);
+		var b=rndint(1,49);
+		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+		add_monster++;
+	}
+	for (j=0;j<ghosts;j++){
+		var a=rndint(1,49);
+		var b=rndint(6,10);
+		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+		add_monster++;
+	}
+	for (j=0;j<ghosts;j++){
+		var a=rndint(35,40);
+		var b=rndint(1,49);
+		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+		add_monster++;
+	}
+	for (j=0;j<ghosts;j++){
+		var a=rndint(1,49);
+		var b=rndint(35,40);
+		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
+		add_monster++;
 	}
 
     for(var y=10; y<15; y++){
 		for(var x=10; x<15; x++){
 			game.map[x][y][1] = "empty";	
+		}
+	}
+	for(var y=0; y<17; y++){
+		for(var x=0; x<17; x++){
+			killEnemy(x,y,game);	
 		}
 	}
 	
@@ -423,8 +451,7 @@ function logic(game){
 				game.pos.x+=a;
 				game.pos.y+=b;
 				if(game.map[game.pos.x][game.pos.y][0]==img_stairs){
-					text("Вы выиграли!!! Нажмите ENTER чтобы играть снова!");
-					gameover();
+					gameover(game,true);
 				}
 				if(game.map[game.pos.x][game.pos.y][2]!="empty"){
 					for (var i in game.inv){
@@ -482,11 +509,11 @@ function logic(game){
 			 		nx=enemy.x;
 			 		ny=enemy.y;
 			 	}
-			 	if(game.map[nx][ny][1]!="empty"){
-			 		nx=enemy.x;
-			 		ny=enemy.y;
-			 		text("еж топчит стену!");
-			 	}
+			 	// if(game.map[nx][ny][1]!="empty"){
+			 	// 	nx=enemy.x;
+			 	// 	ny=enemy.y;
+			 	// 	text("еж топчит стену!");
+			 	// }
 
 			 }
 			stamp=0;
@@ -496,40 +523,68 @@ function logic(game){
 
 			if(enemy.x==game.pos.x && enemy.y==game.pos.y){
 				text("Ваш герой обезглавлен огромным ежиком...")
-				gameover(game);
+				gameover(game, false);
 			}
+		}
+		function amISeeHero(v){
+
 		}
 		for (var enemy of game.enemy){
 			enemy.fromx=enemy.x;
 			enemy.fromy=enemy.y;
 			var px = enemy.x-game.pos.x+4;
 			var py = enemy.y-game.pos.y+4;
-			if(px>=0 && py>=0 && px<=9 && py<=9){
-				if(!game.fow[px][py]){
+			if(enemy.img==img_hedgehog){
+				if(px>=0 && py>=0 && px<=9 && py<=9){
+					if(!game.fow[px][py]){
+						enemy.tax=game.pos.x;
+						enemy.tay=game.pos.y;
+					}
+				}
+				var xmot = enemy.x-enemy.tax;
+				if(game.map[enemy.x-Math.sign(xmot)][enemy.y][1]!="empty"){
+					xmot=0;
+				}
+				var ymot = enemy.y-enemy.tay;
+				if(game.map[enemy.x][enemy.y-Math.sign(ymot)][1]!="empty"){
+					ymot=0;
+				}
+				if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
+					var rnd = Math.abs(xmot)+Math.abs(ymot);
+					rnd = rndint(1,rnd);
+					if (xmot==0 && ymot ==0){}else{
+						if (rnd<=Math.abs(xmot)){
+							if (xmot<0){
+								move(1,0);
+							}else{move(-1,0);};
+						}else{
+							if (ymot<0){
+								move(0,1);
+							}else{move(0,-1);};
+						}
+					}
+				}
+			}
+			if(enemy.img==img_ghost){
+				if(px>=0 && py>=0 && px<=9 && py<=9){
 					enemy.tax=game.pos.x;
 					enemy.tay=game.pos.y;
 				}
-			}
-			var xmot = enemy.x-enemy.tax;
-			if(game.map[enemy.x-Math.sign(xmot)][enemy.y][1]!="empty"){
-				xmot=0;
-			}
-			var ymot = enemy.y-enemy.tay;
-			if(game.map[enemy.x][enemy.y-Math.sign(ymot)][1]!="empty"){
-				ymot=0;
-			}
-			if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
-				var rnd = Math.abs(xmot)+Math.abs(ymot);
-				rnd = rndint(1,rnd);
-				if (xmot==0 && ymot ==0){}else{
-					if (rnd<=Math.abs(xmot)){
-						if (xmot<0){
-							move(1,0);
-						}else{move(-1,0);};
-					}else{
-						if (ymot<0){
-							move(0,1);
-						}else{move(0,-1);};
+				var xmot = enemy.x-enemy.tax;
+				var ymot = enemy.y-enemy.tay;
+				if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
+					var rnd = Math.abs(xmot)+Math.abs(ymot);
+					rnd = rndint(1,rnd);
+					if (xmot==0 && ymot ==0){}else{
+						if (rnd<=Math.abs(xmot)){
+							if (xmot<0){
+								move(1,0);
+							}else{move(-1,0);};
+						}else{
+							if (ymot<0){
+								move(0,1);
+							}else{move(0,-1);};
+						}
 					}
 				}
 			}
@@ -552,8 +607,12 @@ function rndint(min, max) {
   return rand;
 }
 
-function gameover(game){
-	text("Вы проиграли. Нажмите ENTER чтобы начать сначала");
+function gameover(game, win){
+	if(win){
+		text("Вы выиграли!!! Нажмите ENTER чтобы играть снова!");
+	}else{
+		text("Вы проиграли. Нажмите ENTER чтобы начать сначала.");
+	}
 	gameovered=true;
 }
 
