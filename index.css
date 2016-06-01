@@ -1,0 +1,14 @@
+*{
+	padding:0;
+	margin:0;
+}
+
+#console{
+	color: white;
+	position: fixed;
+	width:200px;
+	height: 150px;
+	background: none;
+	font-family: consolas;
+	text-overflow: ellipsis; 
+}
