@@ -36,7 +36,10 @@ const img_motherplant = new Image();
 img_motherplant.src = 'img/motherplant.png';
 const img_stay = new Image();
 img_stay.src = 'img/stay.png';
-
+const img_bite = new Image();
+img_bite.src = 'img/bite.png';
+const img_burdock = new Image();
+img_burdock.src = 'img/burdock.png';
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
 const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, найдите полезные предметы чтобы заполнить его."};
@@ -45,6 +48,11 @@ const item_spear={name:"spear", img:img_spear, text:"Копье гоплита, 
 const item_brick={name:"brick", img:img_brick, text:"Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."};
 const item_stay={name:"stay", img:img_stay, text:"Палочка проростания, превращает в растение"};
 
+const item_bite={name:"bite", img:img_bite, text:"Серьезный укус, нужно забинтовать рану."};
+const item_burdock={name:"burdock", img:img_burdock, text:"Пристал репей, не думаю что стоит бросать его на землю..."};
+
+
+var game={};
 var dh=0;
 const vision=9;
 
@@ -90,7 +98,7 @@ window.onkeyup = function (e) {
 }
 
 window.onload = function () {
-	var game = init();
+	game = init();
 	var oldtime = 0;
 	function loop(time) {
 		var frame = time-oldtime;
@@ -102,7 +110,7 @@ window.onload = function () {
 }
 
 function init(){
-	var game=[];
+	game.map=[];
 	for (x = 0; x < 50; x++) {
   		game.map[x] = [];
   		for (y = 0; y < 50; y++) {
@@ -120,15 +128,15 @@ function init(){
     	}
     }
 	
-	return newgame(game);
+	return newgame();
 }
 
-function addMonster(img,x,y,game){
+function addMonster(img,x,y){
 	game.enemy[add_monster]={img: img, x:x, y:y,fromx:x,fromy:y,tax:x,tay:y, alive:true};
 		add_monster++;
 }
 
-function newgame(game){
+function newgame(){
 	gameovered=false;
 	add_monster=0;
 	game.hp=10;
@@ -165,36 +173,34 @@ function newgame(game){
 	for (j=0;j<45;j++){
 		var a=rndint(11,39);
 		var b=rndint(11,39);
-		addMonster(img_hedgehog,a,b,game);
+		addMonster(img_hedgehog,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(6,10);
 		var b=rndint(1,49);
-		addMonster(img_ghost,a,b,game);
+		addMonster(img_ghost,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(1,49);
 		var b=rndint(6,10);
-		addMonster(img_ghost,a,b,game);
+		addMonster(img_ghost,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(35,40);
 		var b=rndint(1,49);
-		addMonster(img_ghost,a,b,game);
+		addMonster(img_ghost,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(1,49);
 		var b=rndint(35,40);
-		addMonster(img_ghost,a,b,game);
+		addMonster(img_ghost,a,b);
 	}
 	var a=rndint(11,39);
 	var b=rndint(11,39);
-	game.enemy[add_monster]={img: img_motherplant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-	add_monster++;
+	addMonster(img_motherplant,a,b);
 	a=rndint(11,39);
 	b=rndint(11,39);
-	game.enemy[add_monster]={img: img_motherplant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-	add_monster++;
+	addMonster(img_motherplant,a,b);
 
     for(var y=10; y<15; y++){
 		for(var x=10; x<15; x++){
@@ -203,7 +209,7 @@ function newgame(game){
 	}
 	for(var y=0; y<17; y++){
 		for(var x=0; x<17; x++){
-			killEnemy(x,y,game);	
+			killEnemy(x,y);	
 		}
 	}
 	
@@ -269,7 +275,7 @@ function killNotAlive(game){
 }
 
 function draw(game,frame){
-	function animove(i,x,y,fx,fy,p){
+	function animate(i,x,y,fx,fy,p){
 		var dx = fx;
 		var dy = fy;
 		var dx = fx+(x-fx)*p/100;
@@ -392,7 +398,7 @@ function draw(game,frame){
 		if (e.x-posx <vision && e.x-posx>=0){
 			if (e.y-posy <=vision && e.y-posy>=0){
 				if (!game.fow[e.x-posx][e.y-posy]){
-					animove(e.img,e.x-posx,e.y-posy,e.fromx-posx,e.fromy-posy,stamp)
+					animate(e.img,e.x-posx,e.y-posy,e.fromx-posx,e.fromy-posy,stamp)
 			 		// drawimg(e.img,e.x-posx,e.y-posy);
 			 		// drawimg(img_from,e.fromx-posx,e.fromy-posy);
 			 	}	
@@ -490,12 +496,7 @@ function logic(game){
 					gameover(game,true);
 				}
 				if(game.map[game.pos.x][game.pos.y][2]!="empty"){
-					for (var i in game.inv){
-						if(game.inv[i].name=="slot" && ok){
-							game.inv[i]=game.map[game.pos.x][game.pos.y][2];
-							ok=false;
-						}
-					}
+					addItem(game.map[game.pos.x][game.pos.y][2],true);
 					game.map[game.pos.x][game.pos.y][2]="empty";
 				}
 				enemyturn();
@@ -508,9 +509,9 @@ function logic(game){
 			}else{
 				var ok=true;
 				for(var i=1; i<5; i++){
-					if(enemyInPos(x+a*i,y+b*i,game)!=0 && ok){
-						killEnemy(x+a*i,y+b*i,game);
-						text("Вы пронзили ежа копьем!")
+					if(enemyInPos(x+a*i,y+b*i)!=0 && ok){
+						killEnemy(x+a*i,y+b*i);
+						text("Вы пронзили врага копьем!")
 						game.inv[game.select]=item_slot;
 						game.map[x+a*i][y+b*i][2]=item_spear;
 						ok=false;
@@ -537,8 +538,8 @@ function logic(game){
 			}else{
 				var ok=true;
 				for(var i=1; i<5; i++){
-					if(enemyInPos(x+a*i,y+b*i,game)!=0 && ok){
-						enemyInPos(x+a*i,y+b*i,game).img=img_plant;
+					if(enemyInPos(x+a*i,y+b*i)!=0 && ok){
+						enemyInPos(x+a*i,y+b*i).img=img_plant;
 						text("Даже поливать не нужно!");
 						ok=false;
 						game.select=0;
@@ -554,7 +555,9 @@ function logic(game){
 	function enemyturn(){
 		killNotAlive(game);
 		text("--------------");
-		function move(a,b){
+		function move(a,b,monster){
+			var wound=item_bite;
+			if(monster.name==plant){wound=item_burdock}
 			var nx=enemy.x+a;
 			var ny=enemy.y+b;
 
@@ -574,9 +577,8 @@ function logic(game){
 			 enemy.y=ny;
 			 if(enemy.x==game.pos.x && enemy.y==game.pos.y){
 			 	text("Героя серьезно укусили");
-				hpMinus(1, game);
-				killEnemy(enemy.x,enemy.y,game);
-				// gameover(game, false);
+				killEnemy(enemy.x,enemy.y);
+				addItem(wound,false);
 			}
 			stamp=0;
 		}
@@ -593,34 +595,36 @@ function logic(game){
 				var b=rndint(1,49);
 				text("Герой слышит вой новорожденного плотоядного растения ");
 				if(!((a==game.pos.x || a==game.pos.x-1|| a==game.pos.x+1) && (b==game.pos.y || b==game.pos.y-1|| b==game.pos.y+1))){
-					if(game.map[a][b][1]=="empty"){
-						game.enemy[add_monster]={img: img_plant, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-						add_monster++;
+					if(game.map[a][b][1]=="empty" && enemyInPos(a,b)==0){
+						addMonster(img_plant,a,b);
 					}
 				}
-				
-				for (var a=-1;a<=1;a++){	
-					if(enemy.x+a==game.pos.x && enemy.y==game.pos.y){
-						move(a,0);	
-					}
-				}
-				for (var b=-1;b<=1;b++){
-					if(enemy.x==game.pos.x && enemy.y+b==game.pos.y){
-						move(0,b);	
-					}
+				if(game.pos.x==enemy.x-1 && game.pos.y==enemy.y){
+				move(-1,0);
+				}	
+				if(game.pos.x==enemy.x+1 && game.pos.y==enemy.y){
+					move(1,0);
+				}	
+				if(game.pos.y==enemy.y+1 && game.pos.x==enemy.x){
+					move(0,1);
+				}	
+				if(game.pos.y==enemy.y-1 && game.pos.x==enemy.x){
+					move(0,-1);
 				}	
 			}
 			if(enemy.img==img_plant){
-				for (var a=-1;a<=1;a++){	
-					if(enemy.x+a==game.pos.x && enemy.y==game.pos.y){
-						move(a,0);	
-					}
-				}
-				for (var b=-1;b<=1;b++){
-					if(enemy.x==game.pos.x && enemy.y+b==game.pos.y){
-						move(0,b);	
-					}
+				if(game.pos.x==enemy.x-1 && game.pos.y==enemy.y){
+				move(-1,0);
 				}	
+				if(game.pos.x==enemy.x+1 && game.pos.y==enemy.y){
+					move(1,0);
+				}	
+				if(game.pos.y==enemy.y+1 && game.pos.x==enemy.x){
+					move(0,1);
+				}	
+				if(game.pos.y==enemy.y-1 && game.pos.x==enemy.x){
+					move(0,-1);
+				}
 			}
 			if(enemy.img==img_hedgehog){
 				if(px>=0 && py>=0 && px<=9 && py<=9){
@@ -681,7 +685,7 @@ function logic(game){
  	return game;
 }
 
-function killEnemy(x,y,game){
+function killEnemy(x,y){
 		for (var e in game.enemy){
 			if (game.enemy[e].x==x && game.enemy[e].y==y){
 				// game.enemy.splice(e, 1);
@@ -714,7 +718,7 @@ function text(string){
   $('#console').html(txt);
 }
 
-function enemyInPos(x,y,game){
+function enemyInPos(x,y){
 	var r=0;
 	for (var e of game.enemy){
 		if (e.x==x && e.y==y){
@@ -728,6 +732,30 @@ function hpMinus(q,game){
 	game.hp-=q;
 	if (game.hp<=0){
 		text("Герой растерзан... "+game.hp);
+		gameover(game,false);
+	}
+}
+
+function addItem(item,good){
+	var ok = true;
+	if(good){
+		for (var i in game.inv){
+			if(game.inv[i].name=="slot" && ok){
+				game.inv[i]=item;
+				ok=false;
+			}
+		}
+	}else{
+		for (var i in game.inv){
+			// console.log(game.inv.length-i-1);
+			if(game.inv[game.inv.length-i-1].name=="slot" && ok){
+				game.inv[game.inv.length-i-1]=item;
+				ok=false;
+			}
+		}
+	}
+	if(ok){
+		text("Герой не может вынести большего груза боли старадний и артефактов...");
 		gameover(game,false);
 	}
 }
