@@ -557,7 +557,7 @@ function logic(game){
 		text("--------------");
 		function move(a,b,monster){
 			var wound=item_bite;
-			if(monster.name==plant){wound=item_burdock}
+			if(monster.img==img_plant){wound=item_burdock}
 			var nx=enemy.x+a;
 			var ny=enemy.y+b;
 
@@ -600,30 +600,30 @@ function logic(game){
 					}
 				}
 				if(game.pos.x==enemy.x-1 && game.pos.y==enemy.y){
-				move(-1,0);
+					move(-1,0,enemy);
 				}	
 				if(game.pos.x==enemy.x+1 && game.pos.y==enemy.y){
-					move(1,0);
+					move(1,0,enemy);
 				}	
 				if(game.pos.y==enemy.y+1 && game.pos.x==enemy.x){
-					move(0,1);
+					move(0,1,enemy);
 				}	
 				if(game.pos.y==enemy.y-1 && game.pos.x==enemy.x){
-					move(0,-1);
+					move(0,-1,enemy);
 				}	
 			}
 			if(enemy.img==img_plant){
 				if(game.pos.x==enemy.x-1 && game.pos.y==enemy.y){
-				move(-1,0);
+					move(-1,0,enemy);
 				}	
 				if(game.pos.x==enemy.x+1 && game.pos.y==enemy.y){
-					move(1,0);
+					move(1,0,enemy);
 				}	
 				if(game.pos.y==enemy.y+1 && game.pos.x==enemy.x){
-					move(0,1);
+					move(0,1,enemy);
 				}	
 				if(game.pos.y==enemy.y-1 && game.pos.x==enemy.x){
-					move(0,-1);
+					move(0,-1,enemy);
 				}
 			}
 			if(enemy.img==img_hedgehog){
@@ -647,12 +647,12 @@ function logic(game){
 					if (xmot==0 && ymot ==0){}else{
 						if (rnd<=Math.abs(xmot)){
 							if (xmot<0){
-								move(1,0);
-							}else{move(-1,0);};
+								move(1,0,enemy);
+							}else{move(-1,0,enemy);};
 						}else{
 							if (ymot<0){
-								move(0,1);
-							}else{move(0,-1);};
+								move(0,1,enemy);
+							}else{move(0,-1,enemy);};
 						}
 					}
 				}
@@ -670,12 +670,12 @@ function logic(game){
 					if (xmot==0 && ymot ==0){}else{
 						if (rnd<=Math.abs(xmot)){
 							if (xmot<0){
-								move(1,0);
-							}else{move(-1,0);};
+								move(1,0,enemy);
+							}else{move(-1,0,enemy);};
 						}else{
 							if (ymot<0){
-								move(0,1);
-							}else{move(0,-1);};
+								move(0,1,enemy);
+							}else{move(0,-1,enemy);};
 						}
 					}
 				}
