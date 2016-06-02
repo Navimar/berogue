@@ -40,13 +40,18 @@ const img_bite = new Image();
 img_bite.src = 'img/bite.png';
 const img_burdock = new Image();
 img_burdock.src = 'img/burdock.png';
+const img_redburdock = new Image();
+img_redburdock.src = 'img/redburdock.png';
 const img_water = new Image();
 img_water.src = 'img/water.png';
 const img_fish = new Image();
 img_fish.src = 'img/fish.png';
 const img_drawn = new Image();
 img_drawn.src = 'img/drawn.png';
-
+const img_pickaxe = new Image();
+img_pickaxe.src = 'img/pickaxe.png';
+const img_rock = new Image();
+img_rock.src = 'img/rock.png';
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
 const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, найдите полезные предметы чтобы заполнить его."};
@@ -54,9 +59,12 @@ const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, �
 const item_spear={name:"spear", img:img_spear, text:"Копье гоплита, метните его во врага!"};
 const item_brick={name:"brick", img:img_brick, text:"Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."};
 const item_stay={name:"stay", img:img_stay, text:"Палочка проростания, превращает в растение"};
+const item_pickaxe={name:"pickaxe", img:img_pickaxe, text:"Кирка, крушит стены."};
+
 
 const item_bite={name:"bite", img:img_bite, text:"Серьезный укус, нужно забинтовать рану."};
 const item_burdock={name:"burdock", img:img_burdock, text:"Пристал репей, не думаю что стоит бросать его на землю..."};
+const item_redburdock={name:"redburdock", img:img_redburdock, text:"Репей главного хищного растения."};
 const item_drawn={name:"drawn", img:img_drawn, text:"Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"};
 
 var game={};
@@ -65,6 +73,7 @@ const vision=9;
 
 var gameovered=false;
 var add_monster = 0;
+var localEnemy=[];
 
 var stamp=0;
 var key=0;
@@ -110,7 +119,7 @@ window.onload = function () {
 	function loop(time) {
 		var frame = time-oldtime;
 		oldtime=time;
-    	run(game,frame);
+    	run(frame);
     	requestAnimationFrame(loop);
 	}
 	requestAnimationFrame(loop);
@@ -146,7 +155,6 @@ function addMonster(img,x,y){
 function newgame(){
 	gameovered=false;
 	add_monster=0;
-	game.hp=10;
 
 	for(var y=0; y<50; y++){
 		for(var x=0; x<50; x++){
@@ -170,11 +178,14 @@ function newgame(){
     		if(rndint(0,4)==0){
     			game.map[x][y][1] = img_wall;
     		}
-    		if (x<10 || x>=40){
-    			game.map[x][y][1] = img_wall;	
+    		if ((y==13 || y == 14)&&(x!==40 && x!==41)){
+    			game.map[x][y][1] = img_wall;
     		}
-    		if (y<10 || y>=40){
-    			game.map[x][y][1] = img_wall;	
+    		if (x<5 || x>=45){
+    			game.map[x][y][1] = img_rock;	
+    		}
+    		if (y<5 || y>=45){
+    			game.map[x][y][1] = img_rock;	
     		}	
 		}
 	}
@@ -183,8 +194,8 @@ function newgame(){
 	game.enemy=[];
 	var ghosts=15;
 	for (j=0;j<90;j++){
-		var a=rndint(11,39);
-		var b=rndint(11,39);
+		var a=rndint(5,45);
+		var b=rndint(5,45);
 		if(game.map[a][b][0]==img_floor){
 			addMonster(img_hedgehog,a,b);
 		}else{
@@ -214,22 +225,22 @@ function newgame(){
 	var a=rndint(11,39);
 	var b=rndint(11,39);
 	addMonster(img_motherplant,a,b);
-	a=rndint(11,39);
-	b=rndint(11,39);
-	addMonster(img_motherplant,a,b);
+	// a=rndint(11,39);
+	// b=rndint(11,39);
+	// addMonster(img_motherplant,a,b);
 
-    for(var y=10; y<15; y++){
-		for(var x=10; x<15; x++){
+    for(var y=5; y<11; y++){
+		for(var x=5; x<11; x++){
 			game.map[x][y][1] = "empty";	
 		}
 	}
-	for(var y=0; y<17; y++){
-		for(var x=0; x<17; x++){
+	for(var y=0; y<12; y++){
+		for(var x=0; x<12; x++){
 			killEnemy(x,y);	
 		}
 	}
 	
-	game.pos = {x:12,y:12};
+	game.pos = {x:7,y:7};
 	text("Началась новая игра. Найдите выход из подземелья! WASD чтобы ходить. QE чтобы выбирать предметы. SPACE чтобы стоять на месте")
 
 	game.select=0;
@@ -238,15 +249,23 @@ function newgame(){
 		game.inv[iv] = item_slot;
 	}
 	game.inv[0]=item_move;
-	game.inv[1]=item_spear;
-	// game.inv[2]=item_stay;
-	// game.inv[3]=item_brick;
+	game.inv[1]=item_pickaxe;
+	game.inv[2]=item_pickaxe;
+	game.inv[3]=item_pickaxe;
 	a=rndint(11,39);
 	b=rndint(11,39);
 	game.map[a][b][2] = item_brick;
-	a=rndint(11,39);
-	b=rndint(11,39);
+	a=rndint(6,45);
+	b=rndint(6,45);
 	game.map[a][b][2] = item_stay;
+	a=rndint(6,45);
+	b=rndint(6,45);
+	// game.map[a][b][2] = item_spear;
+	for (var p=0;p<150;p++){
+		a=rndint(6,45);
+		b=rndint(6,45);
+		game.map[a][b][2] = item_pickaxe;
+	}
 	
 	return game;
 }
@@ -271,7 +290,7 @@ function drawimg(img,x,y){
 	}else{ctx.drawImage(img_wat,x*dh+3*dh,y*dh,dh,dh)}
 }
 
-function imfp(x,y,z,game){
+function imfp(x,y,z){
 	if (game.map[x][y][z] != "empty"){
 		if(z<2){
 			return game.map[x][y][z];
@@ -281,7 +300,7 @@ function imfp(x,y,z,game){
 	} else return "empty";
 }
 
-function killNotAlive(game){
+function killNotAlive(){
 	for (var e in game.enemy){
 			if (!game.enemy[e].alive){
 				game.enemy.splice(e, 1);
@@ -290,7 +309,7 @@ function killNotAlive(game){
 		}
 }
 
-function draw(game,frame){
+function draw(frame){
 	function animate(i,x,y,fx,fy,p){
 		var dx = fx;
 		var dy = fy;
@@ -304,7 +323,7 @@ function draw(game,frame){
 	if (stamp<=100){
 		stamp+=frame/7;
 	}else{
-		killNotAlive(game);
+		killNotAlive();
 	}
 	var posx=game.pos.x-(vision-1)/2;
 	var posy=game.pos.y-(vision-1)/2;
@@ -444,12 +463,12 @@ function draw(game,frame){
 
 }
 
-function run(game,frame){
-	game = logic(game);
-	draw(game,frame);
+function run(frame){
+	logic();
+	draw(frame);
 }
 
-function logic(game){
+function logic(){
 	if (!gameovered){
 		if (key=="select_left"){
 			if (game.select>0){
@@ -535,6 +554,39 @@ function logic(game){
 				justmoved = true;
 			}
 		}
+		if (act==="pickaxe"){
+			if(game.map[game.pos.x+a][game.pos.y+b][1]!=img_rock){
+				game.map[game.pos.x+a][game.pos.y+b][1]="empty";
+				killEnemy(game.pos.x+a,game.pos.y+b);
+				text("Ломай, убивай!!!");
+				game.inv[game.select]=item_slot;
+				game.select=0;
+				enemyturn();
+			}else{
+				text("Цыньк!");
+			}
+		}
+		if (act==="burdock"){
+			if(game.map[game.pos.x+a][game.pos.y+b][1]=="empty" &&(a!=0 || b!=0)){
+				addMonster(img_plant,game.pos.x+a,game.pos.y+b);
+				text("Растет как на дрожащ!");
+				game.inv[game.select]=item_slot;
+				enemyturn();
+			}else{
+				text("Некуда тут");
+			}
+		}
+		if (act==="redburdock"){
+			if(game.map[game.pos.x+a][game.pos.y+b][1]=="empty" &&(a!=0 || b!=0)){
+				addMonster(img_motherplant,game.pos.x+a,game.pos.y+b);
+				text("Растет как на дрожащ!");
+				game.inv[game.select]=item_slot;
+				game.select=0;
+				enemyturn();
+			}else{
+				text("Некуда тут");
+			}
+		}
 		if (act==="spear"){
 			if(a==0 && b==0){
 				text("Копье слишком длинное для харакири!")
@@ -577,7 +629,7 @@ function logic(game){
 						game.select=0;
 					}
 				}
-			enemyturn();
+			// enemyturn();
 			}
 		}
 		key=0;
@@ -585,43 +637,61 @@ function logic(game){
 	}
 
 	function enemyturn(){
-		killNotAlive(game);
+		killNotAlive();
 		text("--------------");
+		
 		function move(a,b,monster){
 			var wound=item_bite;
+			var wound2=false;
 			if(monster.img==img_plant){wound=item_burdock}
-			
+			if(monster.img==img_motherplant){wound=item_redburdock;wound2=item_bite;}
+
 			var nx=enemy.x+a;
 			var ny=enemy.y+b;
-
+			
 			for (var e of game.enemy){
 			 	if (nx==e.x && ny==e.y && e.alive){
-			 		nx=enemy.x;
-			 		ny=enemy.y;
-			 	}
+			 		if(monster.img==img_plant || monster.img==img_motherplant){
+				 		killEnemy(nx,ny);
+				 		text("Хрум-хрум-хрум");
+			 		}else{
+			 			nx=enemy.x;
+				 		ny=enemy.y;
+			 		}
+				}
 			}
-			// if(monster.img==img_hedgehog && game.map[nx][ny][0]==img_water){
-			// 	nx=enemy.x;
-			//  	ny=enemy.y;
-			// }
-
 			enemy.x=nx;
 			enemy.y=ny;
 			if(enemy.x==game.pos.x && enemy.y==game.pos.y){
 				text("Героя серьезно укусили");
 				killEnemy(enemy.x,enemy.y);
 				addItem(wound,false);
+				if (wound2!=false){
+					addItem(wound2,false);
+				}
 			}
 			stamp=0;
 		}
-		function amISeeHero(v){
-
+		function near(x,y,a,b){
+			if(x==a-1 && y==b){
+				return {a:-1,b:0};
+			}	
+			if(x==a+1 && y==b){
+				return {a:1,b:0};
+			}	
+			if(y==b+1 && x==a){
+				return {a:0,b:1};
+			}	
+			if(y==b-1 && x==a){
+				return {a:0,b:-1};
+			}
+			return {a:0,b:0};
 		}
 		for (var enemy of game.enemy){
-			enemy.fromx=enemy.x;
-			enemy.fromy=enemy.y;
 			var px = enemy.x-game.pos.x+4;
 			var py = enemy.y-game.pos.y+4;
+			enemy.fromx=enemy.x;
+			enemy.fromy=enemy.y;
 			if(enemy.img==img_motherplant){
 				var a=rndint(1,49);
 				var b=rndint(1,49);
@@ -631,95 +701,94 @@ function logic(game){
 						addMonster(img_plant,a,b);
 					}
 				}
-				if(game.pos.x==enemy.x-1 && game.pos.y==enemy.y){
-					move(-1,0,enemy);
-				}	
-				if(game.pos.x==enemy.x+1 && game.pos.y==enemy.y){
-					move(1,0,enemy);
-				}	
-				if(game.pos.y==enemy.y+1 && game.pos.x==enemy.x){
-					move(0,1,enemy);
-				}	
-				if(game.pos.y==enemy.y-1 && game.pos.x==enemy.x){
-					move(0,-1,enemy);
-				}	
-			}
-			if(enemy.img==img_plant){
-				if(game.pos.x==enemy.x-1 && game.pos.y==enemy.y){
-					move(-1,0,enemy);
-				}	
-				if(game.pos.x==enemy.x+1 && game.pos.y==enemy.y){
-					move(1,0,enemy);
-				}	
-				if(game.pos.y==enemy.y+1 && game.pos.x==enemy.x){
-					move(0,1,enemy);
-				}	
-				if(game.pos.y==enemy.y-1 && game.pos.x==enemy.x){
-					move(0,-1,enemy);
-				}
-			}
-			if(enemy.img==img_hedgehog || enemy.img == img_fish){
-				if(enemy.img==img_hedgehog){
-					var fear=img_water;
-				}else{
-					var fear=img_floor;
-				}
-				if(px>=0 && py>=0 && px<=9 && py<=9){
-					if(!game.fow[px][py]){
-						enemy.tax=game.pos.x;
-						enemy.tay=game.pos.y;
+				
+				var okkk=true;
+				for (eka of game.enemy){
+					var n = near(eka.x,eka.y,enemy.x,enemy.y);
+					if(n.a!=0 || n.b!=0 && okkk==true){
+						text("Хищный цветок кого-то заживал!")
+						move(n.a,n.b,enemy);
+						okkk=false;	
 					}
 				}
-				var xmot = enemy.x-enemy.tax;
-				if(game.map[enemy.x-Math.sign(xmot)][enemy.y][1]!="empty" || game.map[enemy.x-Math.sign(xmot)][enemy.y][0]==fear){
-					xmot=0;
+				if(okkk){
+					var n = near(game.pos.x,game.pos.y,enemy.x,enemy.y);
+					if(n.a!=0 || n.b!=0){
+						move(n.a,n.b,enemy);
+					}	
+				}	
+			}
+			if(px>=0 && py>=0 && px<=9 && py<=9){
+				
+				if(enemy.img==img_plant){
+					var n = near(game.pos.x,game.pos.y,enemy.x,enemy.y);
+					if(n.a!=0 || n.b!=0){
+						move(n.a,n.b,enemy);
+					}	
+					
 				}
-				var ymot = enemy.y-enemy.tay;
-				if(game.map[enemy.x][enemy.y-Math.sign(ymot)][1]!="empty" || game.map[enemy.x][enemy.y-Math.sign(ymot)][0]==fear){
-					ymot=0;
-				}
-				if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
-					var rnd = Math.abs(xmot)+Math.abs(ymot);
-					rnd = rndint(1,rnd);
-					if (xmot==0 && ymot ==0){}else{
-						if (rnd<=Math.abs(xmot)){
-							if (xmot<0){
-								move(1,0,enemy);
-							}else{move(-1,0,enemy);};
-						}else{
-							if (ymot<0){
-								move(0,1,enemy);
-							}else{move(0,-1,enemy);};
+				if(enemy.img==img_hedgehog || enemy.img == img_fish){
+					if(enemy.img==img_hedgehog){
+						var fear=img_water;
+					}else{
+						var fear=img_floor;
+					}
+					if(px>=0 && py>=0 && px<=9 && py<=9){
+						if(!game.fow[px][py]){
+							enemy.tax=game.pos.x;
+							enemy.tay=game.pos.y;
+						}
+					}
+					var xmot = enemy.x-enemy.tax;
+					if(game.map[enemy.x-Math.sign(xmot)][enemy.y][1]!="empty" || game.map[enemy.x-Math.sign(xmot)][enemy.y][0]==fear){
+						xmot=0;
+					}
+					var ymot = enemy.y-enemy.tay;
+					if(game.map[enemy.x][enemy.y-Math.sign(ymot)][1]!="empty" || game.map[enemy.x][enemy.y-Math.sign(ymot)][0]==fear){
+						ymot=0;
+					}
+					if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
+						var rnd = Math.abs(xmot)+Math.abs(ymot);
+						rnd = rndint(1,rnd);
+						if (xmot==0 && ymot ==0){}else{
+							if (rnd<=Math.abs(xmot)){
+								if (xmot<0){
+									move(1,0,enemy);
+								}else{move(-1,0,enemy);};
+							}else{
+								if (ymot<0){
+									move(0,1,enemy);
+								}else{move(0,-1,enemy);};
+							}
 						}
 					}
 				}
-			}
-			if(enemy.img==img_ghost){
-				if(px>=0 && py>=0 && px<=9 && py<=9){
-					enemy.tax=game.pos.x;
-					enemy.tay=game.pos.y;
-				}
-				var xmot = enemy.x-enemy.tax;
-				var ymot = enemy.y-enemy.tay;
-				if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
-					var rnd = Math.abs(xmot)+Math.abs(ymot);
-					rnd = rndint(1,rnd);
-					if (xmot==0 && ymot ==0){}else{
-						if (rnd<=Math.abs(xmot)){
-							if (xmot<0){
-								move(1,0,enemy);
-							}else{move(-1,0,enemy);};
-						}else{
-							if (ymot<0){
-								move(0,1,enemy);
-							}else{move(0,-1,enemy);};
+				if(enemy.img==img_ghost){
+					if(px>=0 && py>=0 && px<=9 && py<=9){
+						enemy.tax=game.pos.x;
+						enemy.tay=game.pos.y;
+					}
+					var xmot = enemy.x-enemy.tax;
+					var ymot = enemy.y-enemy.tay;
+					if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
+						var rnd = Math.abs(xmot)+Math.abs(ymot);
+						rnd = rndint(1,rnd);
+						if (xmot==0 && ymot ==0){}else{
+							if (rnd<=Math.abs(xmot)){
+								if (xmot<0){
+									move(1,0,enemy);
+								}else{move(-1,0,enemy);};
+							}else{
+								if (ymot<0){
+									move(0,1,enemy);
+								}else{move(0,-1,enemy);};
+							}
 						}
 					}
 				}
 			}
 		}
 	}
- 	return game;
 }
 
 function killEnemy(x,y){
@@ -738,7 +807,7 @@ function rndint(min, max) {
   return rand;
 }
 
-function gameover(game, win){
+function gameover(win){
 	if(win){
 		text("Вы выиграли!!! Нажмите ENTER чтобы играть снова!");
 	}else{
@@ -765,14 +834,6 @@ function enemyInPos(x,y){
 	return r;
 }
 
-function hpMinus(q,game){
-	game.hp-=q;
-	if (game.hp<=0){
-		text("Герой растерзан... "+game.hp);
-		gameover(game,false);
-	}
-}
-
 function addItem(item,good){
 	var ok = true;
 	if(good){
@@ -793,6 +854,6 @@ function addItem(item,good){
 	}
 	if(ok){
 		text("Герой не может вынести большего груза боли старадний и артефактов...");
-		gameover(game,false);
+		gameover(false);
 	}
 }
