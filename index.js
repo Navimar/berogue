@@ -157,7 +157,7 @@ function newgame(){
     }
     for(var y=0; y<50; y++){
     	for(var x=0; x<50; x++){ 
-    		if(rndint(0,3)==0){
+    		if(rndint(0,99)<25){
     			game.map[x][y][0] = img_floor;
     			if (x>1&&y>1){
 	    			game.map[x-1][y][0] = img_floor;
@@ -175,18 +175,14 @@ function newgame(){
     		}
     		if (y<10 || y>=40){
     			game.map[x][y][1] = img_wall;	
-    		}
-    		if (x==35 && y==35){
-    			game.map[x][y][0] = img_stairs;	
-    			game.map[x][y][1] = "empty";	
-    		}
-
+    		}	
 		}
 	}
-
+	game.map[35][35][0] = img_stairs;	
+	game.map[35][35][1] = "empty";	
 	game.enemy=[];
 	var ghosts=15;
-	for (j=0;j<70;j++){
+	for (j=0;j<90;j++){
 		var a=rndint(11,39);
 		var b=rndint(11,39);
 		if(game.map[a][b][0]==img_floor){
