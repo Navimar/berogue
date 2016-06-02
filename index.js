@@ -54,12 +54,12 @@ const img_rock = new Image();
 img_rock.src = 'img/rock.png';
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
-const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, найдите полезные предметы чтобы заполнить его."};
+const item_slot={name:"slot", img:img_slot, text:"Уголок сердца Героя, его можно заполнить любимыми предметами или болью и страданиями."};
 
 const item_spear={name:"spear", img:img_spear, text:"Копье гоплита, метните его во врага!"};
 const item_brick={name:"brick", img:img_brick, text:"Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."};
 const item_stay={name:"stay", img:img_stay, text:"Палочка проростания, превращает в растение"};
-const item_pickaxe={name:"pickaxe", img:img_pickaxe, text:"Кирка, крушит стены."};
+const item_pickaxe={name:"pickaxe", img:img_pickaxe, text:"Кирка, крушит стены и черепа."};
 
 
 const item_bite={name:"bite", img:img_bite, text:"Серьезный укус, нужно забинтовать рану."};
@@ -260,8 +260,8 @@ function newgame(){
 	game.map[a][b][2] = item_stay;
 	a=rndint(6,45);
 	b=rndint(6,45);
-	// game.map[a][b][2] = item_spear;
-	for (var p=0;p<150;p++){
+	game.map[a][b][2] = item_spear;
+	for (var p=0;p<120;p++){
 		a=rndint(6,45);
 		b=rndint(6,45);
 		game.map[a][b][2] = item_pickaxe;
@@ -555,7 +555,7 @@ function logic(){
 			}
 		}
 		if (act==="pickaxe"){
-			if(game.map[game.pos.x+a][game.pos.y+b][1]!=img_rock){
+			if(game.map[game.pos.x+a][game.pos.y+b][1]==img_wall || enemyInPos(game.pos.x+a,game.pos.y+b)!=false){
 				game.map[game.pos.x+a][game.pos.y+b][1]="empty";
 				killEnemy(game.pos.x+a,game.pos.y+b);
 				text("Ломай, убивай!!!");
@@ -564,6 +564,9 @@ function logic(){
 				enemyturn();
 			}else{
 				text("Цыньк!");
+				if(a==0 && b==0){
+					text("Кирка едва годится вместо зубочистки..");
+				}
 			}
 		}
 		if (act==="burdock"){
