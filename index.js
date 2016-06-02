@@ -52,6 +52,24 @@ const img_pickaxe = new Image();
 img_pickaxe.src = 'img/pickaxe.png';
 const img_rock = new Image();
 img_rock.src = 'img/rock.png';
+const img_redkey= new Image();
+img_redkey.src = 'img/redkey.png';
+const img_bluekey = new Image();
+img_bluekey.src = 'img/bluekey.png';
+const img_whitekey = new Image();
+img_whitekey.src = 'img/whitekey.png';
+const img_rainkey = new Image();
+img_rainkey.src = 'img/rainkey.png';
+const img_miragekey = new Image();
+img_miragekey.src = 'img/miragekey.png';
+const img_magentakey = new Image();
+img_magentakey.src = 'img/magentakey.png';
+const img_greenkey = new Image();
+img_greenkey.src = 'img/greenkey.png';
+const img_goldenkey = new Image();
+img_goldenkey.src = 'img/goldenkey.png';
+const img_blackkey = new Image();
+img_blackkey.src = 'img/blackkey.png';
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
 const item_slot={name:"slot", img:img_slot, text:"Уголок сердца Героя, его можно заполнить любимыми предметами или болью и страданиями."};
@@ -66,6 +84,16 @@ const item_bite={name:"bite", img:img_bite, text:"Серьезный укус, �
 const item_burdock={name:"burdock", img:img_burdock, text:"Пристал репей, не думаю что стоит бросать его на землю..."};
 const item_redburdock={name:"redburdock", img:img_redburdock, text:"Репей главного хищного растения."};
 const item_drawn={name:"drawn", img:img_drawn, text:"Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"};
+
+const item_redkey={name:"redkey", img:img_redkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_goldenkey={name:"goldenkey", img:img_goldenkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_whitekey={name:"whitekey", img:img_whitekey, text:"Один из девяти ключей открывающих портал домой"};
+const item_blackkey={name:"blackkey", img:img_blackkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_greenkey={name:"greenkey", img:img_greenkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_bluekey={name:"bluekey", img:img_bluekey, text:"Один из девяти ключей открывающих портал домой"};
+const item_rainkey={name:"rainkey", img:img_rainkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_magentakey={name:"magentakey", img:img_magentakey, text:"Один из девяти ключей открывающих портал домой"};
+const item_miragekey={name:"miragekey", img:img_miragekey, text:"Один из девяти ключей открывающих портал домой"};
 
 var game={};
 var dh=0;
@@ -147,7 +175,7 @@ function init(){
 	return newgame();
 }
 
-function addMonster(img,x,y){
+function generateMonster(img,x,y){
 	game.enemy[add_monster]={img: img, x:x, y:y,fromx:x,fromy:y,tax:x,tay:y, alive:true};
 		add_monster++;
 }
@@ -155,6 +183,8 @@ function addMonster(img,x,y){
 function newgame(){
 	gameovered=false;
 	add_monster=0;
+	var generatedItems=[];
+	var generateItemCounter=0;
 
 	for(var y=0; y<50; y++){
 		for(var x=0; x<50; x++){
@@ -197,37 +227,37 @@ function newgame(){
 		var a=rndint(5,45);
 		var b=rndint(5,45);
 		if(game.map[a][b][0]==img_floor){
-			addMonster(img_hedgehog,a,b);
+			generateMonster(img_hedgehog,a,b);
 		}else{
-			addMonster(img_fish,a,b);
+			generateMonster(img_fish,a,b);
 		}
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(6,10);
 		var b=rndint(1,49);
-		addMonster(img_ghost,a,b);
+		generateMonster(img_ghost,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(1,49);
 		var b=rndint(6,10);
-		addMonster(img_ghost,a,b);
+		generateMonster(img_ghost,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(35,40);
 		var b=rndint(1,49);
-		addMonster(img_ghost,a,b);
+		generateMonster(img_ghost,a,b);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(1,49);
 		var b=rndint(35,40);
-		addMonster(img_ghost,a,b);
+		generateMonster(img_ghost,a,b);
 	}
 	var a=rndint(11,39);
 	var b=rndint(11,39);
-	addMonster(img_motherplant,a,b);
+	generateMonster(img_motherplant,a,b);
 	// a=rndint(11,39);
 	// b=rndint(11,39);
-	// addMonster(img_motherplant,a,b);
+	// generateMonster(img_motherplant,a,b);
 
     for(var y=5; y<11; y++){
 		for(var x=5; x<11; x++){
@@ -261,11 +291,38 @@ function newgame(){
 	a=rndint(6,45);
 	b=rndint(6,45);
 	game.map[a][b][2] = item_spear;
-	for (var p=0;p<120;p++){
-		a=rndint(6,45);
-		b=rndint(6,45);
-		game.map[a][b][2] = item_pickaxe;
+	for (var p=0;p<99;p++){
+		generateItem(item_pickaxe);
 	}
+	generateItem(item_goldenkey);
+	generateItem(item_whitekey);
+	generateItem(item_blackkey);
+	generateItem(item_greenkey);
+	generateItem(item_redkey);
+	generateItem(item_bluekey);
+	generateItem(item_magentakey);
+	generateItem(item_miragekey);
+	generateItem(item_rainkey);
+
+	function generateItem(item){
+		console.log("generate!");
+		if (generateItemCounter<100){
+			var a=rndint(6,45);
+			var b=rndint(6,45);
+			// if(generatedItems[z][0]!==a && generatedItems[z][1]!==b){
+			    generatedItems[generatedItems.length]=[a,b];
+				game.map[a][b][2] = item;
+				console.log("new item");
+			// }else{
+			// 	generateItem(item,a,b);
+			// 	generateItemCounter++;
+			// 	console.log("deny");
+			// }
+	    }else{
+	    	console.log("ошибка при генерации предметов");
+	    }
+	}
+
 	
 	return game;
 }
@@ -571,7 +628,7 @@ function logic(){
 		}
 		if (act==="burdock"){
 			if(game.map[game.pos.x+a][game.pos.y+b][1]=="empty" &&(a!=0 || b!=0)){
-				addMonster(img_plant,game.pos.x+a,game.pos.y+b);
+				generateMonster(img_plant,game.pos.x+a,game.pos.y+b);
 				text("Растет как на дрожащ!");
 				game.inv[game.select]=item_slot;
 				enemyturn();
@@ -581,7 +638,7 @@ function logic(){
 		}
 		if (act==="redburdock"){
 			if(game.map[game.pos.x+a][game.pos.y+b][1]=="empty" &&(a!=0 || b!=0)){
-				addMonster(img_motherplant,game.pos.x+a,game.pos.y+b);
+				generateMonster(img_motherplant,game.pos.x+a,game.pos.y+b);
 				text("Растет как на дрожащ!");
 				game.inv[game.select]=item_slot;
 				game.select=0;
@@ -701,7 +758,7 @@ function logic(){
 				text("Герой слышит вой новорожденного плотоядного растения ");
 				if(!((a==game.pos.x || a==game.pos.x-1|| a==game.pos.x+1) && (b==game.pos.y || b==game.pos.y-1|| b==game.pos.y+1))){
 					if(game.map[a][b][1]=="empty" && enemyInPos(a,b)==0){
-						addMonster(img_plant,a,b);
+						generateMonster(img_plant,a,b);
 					}
 				}
 				
