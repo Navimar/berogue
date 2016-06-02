@@ -40,6 +40,13 @@ const img_bite = new Image();
 img_bite.src = 'img/bite.png';
 const img_burdock = new Image();
 img_burdock.src = 'img/burdock.png';
+const img_water = new Image();
+img_water.src = 'img/water.png';
+const img_fish = new Image();
+img_fish.src = 'img/fish.png';
+const img_drawn = new Image();
+img_drawn.src = 'img/drawn.png';
+
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
 const item_slot={name:"slot", img:img_slot, text:"Пустой мешочек, найдите полезные предметы чтобы заполнить его."};
@@ -50,7 +57,7 @@ const item_stay={name:"stay", img:img_stay, text:"Палочка пророст�
 
 const item_bite={name:"bite", img:img_bite, text:"Серьезный укус, нужно забинтовать рану."};
 const item_burdock={name:"burdock", img:img_burdock, text:"Пристал репей, не думаю что стоит бросать его на землю..."};
-
+const item_drawn={name:"drawn", img:img_drawn, text:"Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"};
 
 var game={};
 var dh=0;
@@ -150,7 +157,16 @@ function newgame(){
     }
     for(var y=0; y<50; y++){
     	for(var x=0; x<50; x++){ 
+    		if(rndint(0,3)==0){
     			game.map[x][y][0] = img_floor;
+    			if (x>1&&y>1){
+	    			game.map[x-1][y][0] = img_floor;
+	    			game.map[x][y-1][0] = img_floor;
+	    			game.map[x-1][y-1][0] = img_floor;
+    			}
+    		}else{
+    			game.map[x][y][0] = img_water;
+    		}
     		if(rndint(0,4)==0){
     			game.map[x][y][1] = img_wall;
     		}
@@ -170,10 +186,14 @@ function newgame(){
 
 	game.enemy=[];
 	var ghosts=15;
-	for (j=0;j<45;j++){
+	for (j=0;j<70;j++){
 		var a=rndint(11,39);
 		var b=rndint(11,39);
-		addMonster(img_hedgehog,a,b);
+		if(game.map[a][b][0]==img_floor){
+			addMonster(img_hedgehog,a,b);
+		}else{
+			addMonster(img_fish,a,b);
+		}
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(6,10);
@@ -495,6 +515,22 @@ function logic(game){
 				if(game.map[game.pos.x][game.pos.y][0]==img_stairs){
 					gameover(game,true);
 				}
+				if(game.map[game.pos.x][game.pos.y][0]==img_water){
+					text("Если и не утону, то точно задохнусь от этого зловония!");
+					addItem(item_drawn,false);
+				}
+				if(game.map[game.pos.x][game.pos.y][0]==img_floor){
+					var drawntext=true;
+					for (var i in game.inv){
+						if(game.inv[i].img==img_drawn){
+							if(drawntext){
+								text("Герой обсох и обветрился, готов к еще одному заплыву!");
+								drawntext=false;
+							}
+							game.inv[i]=item_slot;
+						}
+					}
+				}
 				if(game.map[game.pos.x][game.pos.y][2]!="empty"){
 					addItem(game.map[game.pos.x][game.pos.y][2],true);
 					game.map[game.pos.x][game.pos.y][2]="empty";
@@ -558,6 +594,7 @@ function logic(game){
 		function move(a,b,monster){
 			var wound=item_bite;
 			if(monster.img==img_plant){wound=item_burdock}
+			
 			var nx=enemy.x+a;
 			var ny=enemy.y+b;
 
@@ -566,17 +603,16 @@ function logic(game){
 			 		nx=enemy.x;
 			 		ny=enemy.y;
 			 	}
-			 	// if(game.map[nx][ny][1]!="empty"){
-			 	// 	nx=enemy.x;
-			 	// 	ny=enemy.y;
-			 	// 	text("еж топчит стену!");
-			 	// }
+			}
+			// if(monster.img==img_hedgehog && game.map[nx][ny][0]==img_water){
+			// 	nx=enemy.x;
+			//  	ny=enemy.y;
+			// }
 
-			 }
-			 enemy.x=nx;
-			 enemy.y=ny;
-			 if(enemy.x==game.pos.x && enemy.y==game.pos.y){
-			 	text("Героя серьезно укусили");
+			enemy.x=nx;
+			enemy.y=ny;
+			if(enemy.x==game.pos.x && enemy.y==game.pos.y){
+				text("Героя серьезно укусили");
 				killEnemy(enemy.x,enemy.y);
 				addItem(wound,false);
 			}
@@ -626,7 +662,12 @@ function logic(game){
 					move(0,-1,enemy);
 				}
 			}
-			if(enemy.img==img_hedgehog){
+			if(enemy.img==img_hedgehog || enemy.img == img_fish){
+				if(enemy.img==img_hedgehog){
+					var fear=img_water;
+				}else{
+					var fear=img_floor;
+				}
 				if(px>=0 && py>=0 && px<=9 && py<=9){
 					if(!game.fow[px][py]){
 						enemy.tax=game.pos.x;
@@ -634,11 +675,11 @@ function logic(game){
 					}
 				}
 				var xmot = enemy.x-enemy.tax;
-				if(game.map[enemy.x-Math.sign(xmot)][enemy.y][1]!="empty"){
+				if(game.map[enemy.x-Math.sign(xmot)][enemy.y][1]!="empty" || game.map[enemy.x-Math.sign(xmot)][enemy.y][0]==fear){
 					xmot=0;
 				}
 				var ymot = enemy.y-enemy.tay;
-				if(game.map[enemy.x][enemy.y-Math.sign(ymot)][1]!="empty"){
+				if(game.map[enemy.x][enemy.y-Math.sign(ymot)][1]!="empty" || game.map[enemy.x][enemy.y-Math.sign(ymot)][0]==fear){
 					ymot=0;
 				}
 				if (Math.abs(xmot)<6 && Math.abs(ymot)<6){
