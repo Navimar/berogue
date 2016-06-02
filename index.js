@@ -123,6 +123,11 @@ function init(){
 	return newgame(game);
 }
 
+function addMonster(img,x,y,game){
+	game.enemy[add_monster]={img: img, x:x, y:y,fromx:x,fromy:y,tax:x,tay:y, alive:true};
+		add_monster++;
+}
+
 function newgame(game){
 	gameovered=false;
 	add_monster=0;
@@ -160,32 +165,27 @@ function newgame(game){
 	for (j=0;j<45;j++){
 		var a=rndint(11,39);
 		var b=rndint(11,39);
-		game.enemy[add_monster]={img: img_hedgehog, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-		add_monster++;
+		addMonster(img_hedgehog,a,b,game);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(6,10);
 		var b=rndint(1,49);
-		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-		add_monster++;
+		addMonster(img_ghost,a,b,game);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(1,49);
 		var b=rndint(6,10);
-		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-		add_monster++;
+		addMonster(img_ghost,a,b,game);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(35,40);
 		var b=rndint(1,49);
-		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-		add_monster++;
+		addMonster(img_ghost,a,b,game);
 	}
 	for (j=0;j<ghosts;j++){
 		var a=rndint(1,49);
 		var b=rndint(35,40);
-		game.enemy[add_monster]={img: img_ghost, x:a, y:b,fromx:a,fromy:b,tax:a,tay:b};
-		add_monster++;
+		addMonster(img_ghost,a,b,game);
 	}
 	var a=rndint(11,39);
 	var b=rndint(11,39);
@@ -259,7 +259,14 @@ function imfp(x,y,z,game){
 	} else return "empty";
 }
 
-
+function killNotAlive(game){
+	for (var e in game.enemy){
+			if (!game.enemy[e].alive){
+				game.enemy.splice(e, 1);
+				add_monster--;
+			}
+		}
+}
 
 function draw(game,frame){
 	function animove(i,x,y,fx,fy,p){
@@ -274,6 +281,8 @@ function draw(game,frame){
 	resize();
 	if (stamp<=100){
 		stamp+=frame/7;
+	}else{
+		killNotAlive(game);
 	}
 	var posx=game.pos.x-(vision-1)/2;
 	var posy=game.pos.y-(vision-1)/2;
@@ -543,13 +552,14 @@ function logic(game){
 	}
 
 	function enemyturn(){
+		killNotAlive(game);
 		text("--------------");
 		function move(a,b){
 			var nx=enemy.x+a;
 			var ny=enemy.y+b;
 
 			for (var e of game.enemy){
-			 	if (nx==e.x && ny==e.y){
+			 	if (nx==e.x && ny==e.y && e.alive){
 			 		nx=enemy.x;
 			 		ny=enemy.y;
 			 	}
@@ -674,8 +684,9 @@ function logic(game){
 function killEnemy(x,y,game){
 		for (var e in game.enemy){
 			if (game.enemy[e].x==x && game.enemy[e].y==y){
-				game.enemy.splice(e, 1);
-				add_monster--;
+				// game.enemy.splice(e, 1);
+				game.enemy[e].alive=false;
+				// add_monster--;
 			}
 		}
 	}
