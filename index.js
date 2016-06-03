@@ -203,11 +203,7 @@ function newgame() {
                 game.map[x][y][0] = "floor";
             } else {
                 if (rndint(0, 99) < 25) {
-                	if(rndint(0, 99) < 20){
                     	game.map[x][y][0] = "floor";
-                    }else{
-                    	game.map[x][y][0] = "trap";
-                    }
                     if (x > 1 && y > 1) {
                         game.map[x - 1][y][0] = "floor";
                         game.map[x][y - 1][0] = "floor";
