@@ -45,21 +45,21 @@ const vision = 9;
 
 var gameovered = false;
 var add_monster = 0;
-// var localEnemy=[];
+var logictimer=0;
 var allKeys = [];
 
 var stamp = 0;
-let cmd = null;
-let codeOld = null;
+var cmd = null;
+var codeOld = null;
 
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
 
 window.onkeydown = function (e) {
-    if(codeOld == e.code){
-        cmd = null;
-        return;
-    }
-    console.log(e.code);
+    // if(codeOld == e.code){
+    //     cmd = null;
+    //     return;
+    // }
+    // console.log(e.code);
     codeOld = e.code;
     if (e.code == "ArrowLeft") {
         cmd = {tp:"use",dir: "left"};
@@ -133,8 +133,8 @@ window.onkeydown = function (e) {
     }
 }
 window.onkeyup = function (e) {
-    cmd = null;
-    codeOld = null;
+    // cmd = null;
+    // codeOld = null;
 }
 
 window.onload = function () {
@@ -371,7 +371,7 @@ function draw(frame) {
 
     resize();
     if (stamp <= 100) {
-        stamp += frame / 7;
+        stamp += frame / 10;
     } else {
         killNotAlive();
     }
@@ -435,12 +435,22 @@ function draw(frame) {
 }
 
 function run(frame) {
-    logic();
+    logic(frame);
     draw(frame);
 }
 
-function logic() {
-    if(cmd==null) return;
+
+function logic(frame) {
+	if(logictimer<1000){
+		// console.log("waiting"+logictimer);
+		logictimer+=frame;
+		return;
+	}
+	logictimer=0;
+    if(cmd==null) {
+    	action(0, 0, "move");
+    	return;
+    } 
     if (!gameovered) {
         let act = null;
         if(cmd.tp == "use"){
@@ -656,7 +666,6 @@ function logic() {
                 if (game.map[game.pos.x][game.pos.y][2] != "empty") {
                     addItem(game.map[game.pos.x][game.pos.y][2], true);
                     if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
-                        console.log("splice");
                         for (k in allKeys) {
                             if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
                                 allKeys.splice(k, 1);
