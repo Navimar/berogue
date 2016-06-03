@@ -120,36 +120,80 @@ const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
 
 window.onkeydown = function (e) {
    var code = e.keyCode ? e.keyCode : e.which;
-   // console.log(code);
+   console.log(code);
 
-   if (code==65 || code == 37){
+   if (code==65){
+   	game.select=0;
    	key="left";
    }
-   if (code==87 ||code == 38){
+   if (code==87){
+   	game.select=0;
    	key="up";
    }
-   if (code==39|| code==68){
+   if (code==68){
+   	game.select=0;
    	key="right";
    }
-   if (code==40 || code==83){
+   if (code==83){
+   	game.select=0;
+   	key ="down";
+   }
+   if (code == 37){
+   	key="left";
+   }
+   if (code == 38){
+   	key="up";
+   }
+   if (code==39){
+   	key="right";
+   }
+   if (code==40){
    	key ="down";
    }
    if (code==32){
+   	game.select=0;
    	key ="sleep";
    }
    if (code==81){
-   	key ="select_left";
+   	key = "select_left";
    }
    if (code==69){
-   	key ="select_right";
+   	key = "select_right";
    }
    if (code==13){
    	key ="enter";
    }
-    // console.log(key);
+   if (code==49){
+   	key =1;
+   }
+   if (code==50){
+   	key =2;
+   }
+   if (code==51){
+   	key =3;
+   }
+   if (code==52){
+   	key =4;
+   }
+   if (code==53){
+   	key =5;
+   }
+   if (code==54){
+   	key =6;
+   }
+   if (code==55){
+   	key =7;
+   }
+   if (code==56){
+   	key =8;
+   }
+   if (code==57){
+   	key =9;
+   }
+    console.log("press "+key);
 }
 window.onkeyup = function (e) {
-   key=0;
+   key="do not pressed!!!";
 }
 
 window.onload = function () {
@@ -452,35 +496,41 @@ function run(frame){
 }
 
 function logic(){
+	// console.log(game.select);
 	if (!gameovered){
-		if (key=="select_left"){
-			if (game.select>0){
-				game.select-=1;
-				text(game.inv[game.select].text);
+		if (typeof(key)==="number"){
+			game.select=key-1;
+			console.log(key);
+		}else{
+			if (key=="select_left"){
+				if (game.select>0){
+					game.select-=1;
+					text(game.inv[game.select].text);
+				}
+				key=false;
 			}
-			key=0;
-		}
-		if (key=="select_right"){
-			if (game.select<vision-1){
-				game.select+=1;
-				text(game.inv[game.select].text);
+			if (key=="select_right"){
+				if (game.select<vision-1){
+					game.select+=1;
+					text(game.inv[game.select].text);
+				}
+				key=false;
 			}
-			key=0;
-		}
-		if (key== "left"){
-			action(-1,0,game.inv[game.select].name);
-		}
-		if (key== "up"){
-			action(0,-1,game.inv[game.select].name);
-		}
-		if (key== "right"){
-			action(1,0,game.inv[game.select].name);
-		}
-		if (key== "down"){
-			action(0,1,game.inv[game.select].name);
-		}
-		if (key=="sleep"){
-			action(0,0,game.inv[game.select].name);
+			if (key== "left"){
+				action(-1,0,game.inv[game.select].name);
+			}
+			if (key== "up"){
+				action(0,-1,game.inv[game.select].name);
+			}
+			if (key== "right"){
+				action(1,0,game.inv[game.select].name);
+			}
+			if (key== "down"){
+				action(0,1,game.inv[game.select].name);
+			}
+			if (key=="sleep"){
+				action(0,0,game.inv[game.select].name);
+			}
 		}
 	}else{
 		if (key=="enter"){
@@ -742,7 +792,7 @@ function logic(){
 			// enemyturn();
 			}
 		}
-		key=0;
+		key=false;;
 		// return "none";
 	}
 
