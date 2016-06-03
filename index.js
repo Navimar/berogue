@@ -68,7 +68,7 @@ window.onkeydown = function (e) {
         cmd = {tp:"use",dir: "up"};
     }
     if (e.code == "ArrowRight") {
-        cmd = {tp:"use",dir: "rigth"};
+        cmd = {tp:"use",dir: "right"};
     }
     if (e.code == "ArrowDown") {
         cmd = {tp:"use",dir: "down"};
