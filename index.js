@@ -443,7 +443,7 @@ function logic() {
             act = game.inv[game.select].name;
         }else if(cmd.tp == "move"){
             act = "move";
-        }else return;
+        }
         if (cmd.dir == "left") {
             action(-1, 0, act);
         }
@@ -460,6 +460,7 @@ function logic() {
             action(0, 0, act);
         }
     }
+    cmd = null;
 
     var min = 0;
     for (var n in allKeys) {
