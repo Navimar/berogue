@@ -307,7 +307,7 @@ function newgame(){
 	generateItem(item_brick);
 	generateItem(item_stay);00
 	generateItem(item_spear);
-	for (var p=0;p<99;p++){
+	for (var p=0;p<149;p++){
 		generateItem(item_pickaxe);
 	}
 	generateItem(item_goldenkey);
@@ -391,12 +391,6 @@ function draw(frame){
 	}
 	var posx=game.pos.x-(vision-1)/2;
 	var posy=game.pos.y-(vision-1)/2;
-	for(var y=0; y<9; y++){
-		for(var x=0; x<9; x++){
-			game.fow[x][y]=false;
-		}
-	}
-	
 	
 	for(var z=0; z<3; z++){
     	for(var y=0; y<9; y++){
@@ -518,6 +512,11 @@ function logic(){
 		//fow
 		var posx=game.pos.x-(vision-1)/2;
 		var posy=game.pos.y-(vision-1)/2;
+		for(var y=0; y<9; y++){
+		for(var x=0; x<9; x++){
+			game.fow[x][y]=false;
+			}
+		}
 		for(var y=0; y<9; y++){
 			for(var x=0; x<9; x++){
 				if (imfp(posx+x,posy+y,1,game)==img_wall){
