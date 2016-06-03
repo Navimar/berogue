@@ -25,16 +25,16 @@ const item_drawn = {
     text: "Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"
 };
 
-const item_redkey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
-const item_goldenkey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
-const item_whitekey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
-const item_blackkey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
-const item_greenkey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
-const item_bluekey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
-const item_rainkey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
+const item_redkey = {name: "redkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_goldenkey = {name: "goldenkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_whitekey = {name: "whitekey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_blackkey = {name: "blackkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_greenkey = {name: "greenkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_bluekey = {name: "bluekey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_rainkey = {name: "rainkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
 const item_magentakey = {
-    name: "key",
-    text: "Один из девяти ключей открывающих портал домой"
+    name: "magentakey",
+    text: "Один из девяти ключей открывающих портал домой", typ:"key"
 };
 const item_miragekey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
 
@@ -97,30 +97,39 @@ window.onkeydown = function (e) {
     }
     if (e.code == "Digit1") {
         game.select = 0;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit2") {
         game.select = 1;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit3") {
         game.select = 2;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit4") {
         game.select = 3;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit5") {
         game.select = 4;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit6") {
         game.select = 5;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit7") {
         game.select = 6;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit8") {
         game.select = 7;
+        text(game.inv[game.select].text);
     }
     if (e.code == "Digit9") {
         game.select = 8;
+        text(game.inv[game.select].text);
     }
 }
 window.onkeyup = function (e) {
@@ -178,7 +187,6 @@ function newgame() {
     for (var y = 6; y < 45; y++) {
         for (var x = 6; x < 45; x++) {
             rndItem[rndItemCounter] = {a: x, b: y};
-            ;
             rndItemCounter++;
         }
     }
@@ -195,7 +203,11 @@ function newgame() {
                 game.map[x][y][0] = "floor";
             } else {
                 if (rndint(0, 99) < 25) {
-                    game.map[x][y][0] = "floor";
+                	if(rndint(0, 99) < 20){
+                    	game.map[x][y][0] = "floor";
+                    }else{
+                    	game.map[x][y][0] = "trap";
+                    }
                     if (x > 1 && y > 1) {
                         game.map[x - 1][y][0] = "floor";
                         game.map[x][y - 1][0] = "floor";
@@ -234,45 +246,42 @@ function newgame() {
         }
     }
     for (let j = 0; j < ghosts; j++) {
-        var a = rndint(6, 10);
+        var a = rndint(0, 6);
         var b = rndint(1, 49);
         generateMonster("ghost", a, b);
     }
     for (let j = 0; j < ghosts; j++) {
         var a = rndint(1, 49);
-        var b = rndint(6, 10);
+        var b = rndint(0, 6);
         generateMonster("ghost", a, b);
     }
     for (let j = 0; j < ghosts; j++) {
-        var a = rndint(35, 40);
+        var a = rndint(45, 49);
         var b = rndint(1, 49);
         generateMonster("ghost", a, b);
     }
     for (let j = 0; j < ghosts; j++) {
         var a = rndint(1, 49);
-        var b = rndint(35, 40);
+        var b = rndint(45, 49);
         generateMonster("ghost", a, b);
     }
     var a = rndint(11, 39);
     var b = rndint(11, 39);
     generateMonster("motherplant", a, b);
-    a = rndint(11, 39);
-    b = rndint(11, 39);
-    generateMonster("motherplant", a, b);
 
-    for (let y = 5; y < 11; y++) {
-        for (var x = 5; x < 11; x++) {
-            game.map[x][y][1] = "empty";
-        }
-    }
-    for (let y = 0; y < 12; y++) {
-        for (var x = 0; x < 12; x++) {
-            killEnemy(x, y);
-        }
-    }
+    // for (let y = 5; y < 11; y++) {
+    //     for (var x = 5; x < 11; x++) {
+    //         game.map[x][y][1] = "empty";
+    //     }
+    // }
+    // for (let y = 0; y < 12; y++) {
+    //     for (var x = 0; x < 12; x++) {
+    //         killEnemy(x, y);
+    //     }
+    // }
 
-    game.pos = {x: 7, y: 7};
-    text("Началась новая игра. Найдите выход из подземелья! WASD чтобы ходить. QE чтобы выбирать предметы. SPACE чтобы стоять на месте")
+    game.pos = {x: rndint(6, 44), y: rndint(6, 44)};
+    text("Началась новая игра. WASD чтобы ходить. Цифры, чтобы выбирать предметы. Стрелки чтобы использовать предметы. SPACE чтобы стоять на месте")
 
     game.select = 0;
     game.inv = [];
@@ -282,6 +291,8 @@ function newgame() {
     game.inv[0] = item_pickaxe;
     game.inv[1] = item_pickaxe;
     game.inv[2] = item_pickaxe;
+    game.inv[3] = item_pickaxe;
+    game.inv[4] = item_pickaxe;
     generateItem(item_brick);
     generateItem(item_stay);
     generateItem(item_spear);
@@ -304,7 +315,7 @@ function newgame() {
         var b = rndItem[m].b;
         rndItem[m].splice;
         game.map[a][b][2] = item;
-        if (item.name == "key") {
+        if (item.typ == "key") {
             allKeys[allKeys.length] = {x: a, y: b, name: item.name};
             // console.log("addkey");
         }
@@ -329,7 +340,7 @@ function resize() {
 function drawimg(name, x, y) {
     if (name == "empty") return;
     if (name == undefined || name == null) nameImg = "undefined";
-    let img = grafio(name);
+    const img = grafio(name);
     if (img) ctx.drawImage(img, x * dh + 3 * dh, y * dh, dh, dh);
 }
 
@@ -434,9 +445,6 @@ function run(frame) {
 
 function logic() {
     if(cmd==null) return;
-    if (cmd.tp == "restart") {
-        newgame(game);
-    }
     if (!gameovered) {
         let act = null;
         if(cmd.tp == "use"){
@@ -459,6 +467,10 @@ function logic() {
         if (cmd.dir == "sleep") {
             action(0, 0, act);
         }
+    }else{
+    	if (cmd.tp == "restart") {
+        	newgame(game);
+    	}
     }
     cmd = null;
 
@@ -636,7 +648,7 @@ function logic() {
                 if (game.map[game.pos.x][game.pos.y][0] == "floor") {
                     var drawntext = true;
                     for (var i in game.inv) {
-                        if (game.inv[i].img == "drawn") {
+                        if (game.inv[i].name == "drawn") {
                             if (drawntext) {
                                 text("Герой обсох и обветрился, готов к еще одному заплыву!");
                                 drawntext = false;
@@ -647,7 +659,7 @@ function logic() {
                 }
                 if (game.map[game.pos.x][game.pos.y][2] != "empty") {
                     addItem(game.map[game.pos.x][game.pos.y][2], true);
-                    if (game.map[game.pos.x][game.pos.y][2].name == "key") {
+                    if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
                         console.log("splice");
                         for (k in allKeys) {
                             if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
@@ -749,8 +761,6 @@ function logic() {
 
     function enemyturn() {
         killNotAlive();
-        text("--------------");
-
         function move(a, b, monster) {
             var wound = item_bite;
             var wound2 = false;
@@ -786,6 +796,12 @@ function logic() {
                     addItem(wound2, false);
                 }
             }
+            if (game.map[enemy.x][enemy.y][0] == "trap"){
+            	text("Кто-то попался в капкан");
+            	killEnemy(enemy.x, enemy.y);
+				game.map[enemy.x][enemy.y][0]="floor";
+            }
+
             stamp = 0;
         }
 
@@ -806,121 +822,129 @@ function logic() {
         }
 
         for (var enemy of game.enemy) {
+        	if (game.map[enemy.x][enemy.y][0] == "trap"){
+        		text("Кто-то попался в капкан при перекличке");
+            	killEnemy(enemy.x, enemy.y);
+				game.map[enemy.x][enemy.y][0]="floor";
+            }
             var px = enemy.x - game.pos.x + 4;
             var py = enemy.y - game.pos.y + 4;
             enemy.fromx = enemy.x;
             enemy.fromy = enemy.y;
-            if (enemy.name == "motherplant") {
-                var a = rndint(1, 49);
-                var b = rndint(1, 49);
-                text("Герой слышит вой новорожденного плотоядного растения ");
-                if (!((a == game.pos.x || a == game.pos.x - 1 || a == game.pos.x + 1) && (b == game.pos.y || b == game.pos.y - 1 || b == game.pos.y + 1))) {
-                    if (game.map[a][b][1] == "empty" && enemyInPos(a, b) == 0) {
-                        generateMonster("plant", a, b);
-                    }
-                }
+            if (enemy.alive){
+	            if (enemy.name == "motherplant") {
+	                var a = rndint(1, 49);
+	                var b = rndint(1, 49);
+	                text("Герой слышит вой новорожденного плотоядного растения ");
+	                if (!((a == game.pos.x || a == game.pos.x - 1 || a == game.pos.x + 1) && (b == game.pos.y || b == game.pos.y - 1 || b == game.pos.y + 1))) {
+	                    if (game.map[a][b][1] == "empty" && enemyInPos(a, b) == 0) {
+	                        generateMonster("plant", a, b);
+	                    }
+	                }
 
-                var okkk = true;
-                for (eka of game.enemy) {
-                    var n = near(eka.x, eka.y, enemy.x, enemy.y);
-                    if (n.a != 0 || n.b != 0 && okkk == true) {
-                        text("Хищный цветок кого-то заживал!")
-                        move(n.a, n.b, enemy);
-                        okkk = false;
-                    }
-                }
-                if (okkk) {
-                    var n = near(game.pos.x, game.pos.y, enemy.x, enemy.y);
-                    if (n.a != 0 || n.b != 0) {
-                        move(n.a, n.b, enemy);
-                    }
-                }
-            }
-            if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
+	                var okkk = true;
+	                for (eka of game.enemy) {
+	                    var n = near(eka.x, eka.y, enemy.x, enemy.y);
+	                    if (n.a != 0 || n.b != 0 && okkk == true) {
+	                        text("Хищный цветок кого-то заживал!")
+	                        move(n.a, n.b, enemy);
+	                        okkk = false;
+	                    }
+	                }
+	                if (okkk) {
+	                    var n = near(game.pos.x, game.pos.y, enemy.x, enemy.y);
+	                    if (n.a != 0 || n.b != 0) {
+	                        move(n.a, n.b, enemy);
+	                    }
+	                }
+	            }
+	            if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
 
-                if (enemy.name == "plant") {
-                    var n = near(game.pos.x, game.pos.y, enemy.x, enemy.y);
-                    if (n.a != 0 || n.b != 0) {
-                        move(n.a, n.b, enemy);
-                    }
+	                if (enemy.name == "plant") {
+	                    var n = near(game.pos.x, game.pos.y, enemy.x, enemy.y);
+	                    if (n.a != 0 || n.b != 0) {
+	                        move(n.a, n.b, enemy);
+	                    }
 
-                }
-                if (enemy.name == "hedgehog" || enemy.name == "fish") {
-                    if (enemy.name == "hedgehog") {
-                        var fear = "water";
-                    } else {
-                        var fear = "floor";
-                    }
-                    if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
-                        if (!game.fow[px][py]) {
-                            enemy.tax = game.pos.x;
-                            enemy.tay = game.pos.y;
-                        }
-                    }
-                    var xmot = enemy.x - enemy.tax;
-                    if (game.map[enemy.x - Math.sign(xmot)][enemy.y][1] != "empty" || game.map[enemy.x - Math.sign(xmot)][enemy.y][0] == fear) {
-                        xmot = 0;
-                    }
-                    var ymot = enemy.y - enemy.tay;
-                    if (game.map[enemy.x][enemy.y - Math.sign(ymot)][1] != "empty" || game.map[enemy.x][enemy.y - Math.sign(ymot)][0] == fear) {
-                        ymot = 0;
-                    }
-                    if (Math.abs(xmot) < 6 && Math.abs(ymot) < 6) {
-                        var rnd = Math.abs(xmot) + Math.abs(ymot);
-                        rnd = rndint(1, rnd);
-                        if (xmot == 0 && ymot == 0) {
-                        } else {
-                            if (rnd <= Math.abs(xmot)) {
-                                if (xmot < 0) {
-                                    move(1, 0, enemy);
-                                } else {
-                                    move(-1, 0, enemy);
-                                }
-                                ;
-                            } else {
-                                if (ymot < 0) {
-                                    move(0, 1, enemy);
-                                } else {
-                                    move(0, -1, enemy);
-                                }
-                                ;
-                            }
-                        }
-                    }
-                }
-                if (enemy.name == "ghost") {
-                    if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
-                        enemy.tax = game.pos.x;
-                        enemy.tay = game.pos.y;
-                    }
-                    var xmot = enemy.x - enemy.tax;
-                    var ymot = enemy.y - enemy.tay;
-                    if (Math.abs(xmot) < 6 && Math.abs(ymot) < 6) {
-                        var rnd = Math.abs(xmot) + Math.abs(ymot);
-                        rnd = rndint(1, rnd);
-                        if (xmot == 0 && ymot == 0) {
-                        } else {
-                            if (rnd <= Math.abs(xmot)) {
-                                if (xmot < 0) {
-                                    move(1, 0, enemy);
-                                } else {
-                                    move(-1, 0, enemy);
-                                }
-                                ;
-                            } else {
-                                if (ymot < 0) {
-                                    move(0, 1, enemy);
-                                } else {
-                                    move(0, -1, enemy);
-                                }
-                                ;
-                            }
-                        }
-                    }
-                }
-            }
+	                }
+	                if (enemy.name == "hedgehog" || enemy.name == "fish") {
+	                    if (enemy.name == "hedgehog") {
+	                        var fear = "water";
+	                    } else {
+	                        var fear = "floor";
+	                    }
+	                    if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
+	                        if (!game.fow[px][py]) {
+	                            enemy.tax = game.pos.x;
+	                            enemy.tay = game.pos.y;
+	                        }
+	                    }
+	                    var xmot = enemy.x - enemy.tax;
+	                    if (game.map[enemy.x - Math.sign(xmot)][enemy.y][1] != "empty" || game.map[enemy.x - Math.sign(xmot)][enemy.y][0] == fear) {
+	                        xmot = 0;
+	                    }
+	                    var ymot = enemy.y - enemy.tay;
+	                    if (game.map[enemy.x][enemy.y - Math.sign(ymot)][1] != "empty" || game.map[enemy.x][enemy.y - Math.sign(ymot)][0] == fear) {
+	                        ymot = 0;
+	                    }
+	                    if (Math.abs(xmot) < 6 && Math.abs(ymot) < 6) {
+	                        var rnd = Math.abs(xmot) + Math.abs(ymot);
+	                        rnd = rndint(1, rnd);
+	                        if (xmot == 0 && ymot == 0) {
+	                        } else {
+	                            if (rnd <= Math.abs(xmot)) {
+	                                if (xmot < 0) {
+	                                    move(1, 0, enemy);
+	                                } else {
+	                                    move(-1, 0, enemy);
+	                                }
+	                                ;
+	                            } else {
+	                                if (ymot < 0) {
+	                                    move(0, 1, enemy);
+	                                } else {
+	                                    move(0, -1, enemy);
+	                                }
+	                                ;
+	                            }
+	                        }
+	                    }
+	                }
+	                if (enemy.name == "ghost") {
+	                    if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
+	                        enemy.tax = game.pos.x;
+	                        enemy.tay = game.pos.y;
+	                    }
+	                    var xmot = enemy.x - enemy.tax;
+	                    var ymot = enemy.y - enemy.tay;
+	                    if (Math.abs(xmot) < 6 && Math.abs(ymot) < 6) {
+	                        var rnd = Math.abs(xmot) + Math.abs(ymot);
+	                        rnd = rndint(1, rnd);
+	                        if (xmot == 0 && ymot == 0) {
+	                        } else {
+	                            if (rnd <= Math.abs(xmot)) {
+	                                if (xmot < 0) {
+	                                    move(1, 0, enemy);
+	                                } else {
+	                                    move(-1, 0, enemy);
+	                                }
+	                                ;
+	                            } else {
+	                                if (ymot < 0) {
+	                                    move(0, 1, enemy);
+	                                } else {
+	                                    move(0, -1, enemy);
+	                                }
+	                                ;
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        }
         }
     }
+text("--------------");
 }
 
 function killEnemy(x, y) {
@@ -969,9 +993,10 @@ function enemyInPos(x, y) {
 function addItem(item, good) {
     var ok = true;
     var okkey = true;
-    if (item.name == "key") {
+    if (item.typ == "key") {
         for (var i in game.inv) {
-            if (okkey && game.inv[game.inv.length - i - 1].name != "key") {
+            if (okkey && game.inv[game.inv.length - i - 1].typ !== "key") {
+            	text("Вы нашли КЛЮЧ!");
                 game.inv[game.inv.length - i - 1] = item;
                 okkey = false;
             }
