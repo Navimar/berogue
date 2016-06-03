@@ -1,6 +1,5 @@
 const grafio = initGrafio();
 
-const item_move = {name: "move", text: "Старые ботинки, WASD чтобы ходить."};
 const item_slot = {
     name: "slot",
     text: "Уголок сердца Героя, его можно заполнить любимыми предметами или болью и страданиями."
@@ -50,83 +49,83 @@ var add_monster = 0;
 var allKeys = [];
 
 var stamp = 0;
-var key = 0;
+let cmd = null;
+let codeOld = null;
+
 const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
 
-
 window.onkeydown = function (e) {
+    if(codeOld == e.code){
+        cmd = null;
+        return;
+    }
+    console.log(e.code);
+    codeOld = e.code;
     if (e.code == "ArrowLeft") {
-        game.select = 0;
-        key = "left";
+        cmd = {tp:"use",dir: "left"};
     }
     if (e.code == "ArrowUp") {
-        game.select = 0;
-        key = "up";
+        cmd = {tp:"use",dir: "up"};
     }
     if (e.code == "ArrowRight") {
-        game.select = 0;
-        key = "right";
+        cmd = {tp:"use",dir: "rigth"};
     }
     if (e.code == "ArrowDown") {
-        game.select = 0;
-        key = "down";
+        cmd = {tp:"use",dir: "down"};
+    }
+    if (e.code == "Delete") {
+        cmd = {tp:"use",dir: "sleep"};
     }
     if (e.code == "KeyA") {
-        key = "left";
+        cmd = {tp:"move",dir: "left"};
     }
     if (e.code == "KeyW") {
-        key = "up";
+        cmd = {tp:"move",dir: "up"};
     }
     if (e.code == "KeyD") {
-        key = "right";
+        cmd = {tp:"move",dir: "right"};
     }
     if (e.code == "KeyS") {
-        key = "down";
+        cmd = {tp:"move",dir: "down"};
     }
     if (e.code == "Space") {
         game.select = 0;
-        key = "sleep";
+        cmd = {tp:"move",dir: "sleep"};
     }
-    if (e.code == "KeyQ") {
-        key = "select_left";
-    }
-    if (e.code == "KeyE") {
-        key = "select_right";
-    }
-    if (e.code == 13) {
-        key = "enter";
+    if (e.code == "Enter") {
+        cmd = {tp:"restart"};
     }
     if (e.code == "Digit1") {
-        key = 1;
+        game.select = 0;
     }
     if (e.code == "Digit2") {
-        key = 2;
+        game.select = 1;
     }
     if (e.code == "Digit3") {
-        key = 3;
+        game.select = 2;
     }
     if (e.code == "Digit4") {
-        key = 4;
+        game.select = 3;
     }
     if (e.code == "Digit5") {
-        key = 5;
+        game.select = 4;
     }
     if (e.code == "Digit6") {
-        key = 6;
+        game.select = 5;
     }
     if (e.code == "Digit7") {
-        key = 7;
+        game.select = 6;
     }
     if (e.code == "Digit8") {
-        key = 8;
+        game.select = 7;
     }
     if (e.code == "Digit9") {
-        key = 9;
+        game.select = 8;
     }
-    console.log("press " + key);
 }
 window.onkeyup = function (e) {
-    key = "do not pressed!!!";
+    cmd = null;
+    codeOld = null;
 }
 
 window.onload = function () {
@@ -225,7 +224,7 @@ function newgame() {
     game.enemy = [];
 
     var ghosts = 15;
-    for (j = 0; j < 90; j++) {
+    for (let j = 0; j < 90; j++) {
         var a = rndint(5, 45);
         var b = rndint(5, 45);
         if (game.map[a][b][0] == "floor") {
@@ -234,22 +233,22 @@ function newgame() {
             generateMonster("fish", a, b);
         }
     }
-    for (j = 0; j < ghosts; j++) {
+    for (let j = 0; j < ghosts; j++) {
         var a = rndint(6, 10);
         var b = rndint(1, 49);
         generateMonster("ghost", a, b);
     }
-    for (j = 0; j < ghosts; j++) {
+    for (let j = 0; j < ghosts; j++) {
         var a = rndint(1, 49);
         var b = rndint(6, 10);
         generateMonster("ghost", a, b);
     }
-    for (j = 0; j < ghosts; j++) {
+    for (let j = 0; j < ghosts; j++) {
         var a = rndint(35, 40);
         var b = rndint(1, 49);
         generateMonster("ghost", a, b);
     }
-    for (j = 0; j < ghosts; j++) {
+    for (let j = 0; j < ghosts; j++) {
         var a = rndint(1, 49);
         var b = rndint(35, 40);
         generateMonster("ghost", a, b);
@@ -261,12 +260,12 @@ function newgame() {
     b = rndint(11, 39);
     generateMonster("motherplant", a, b);
 
-    for (var y = 5; y < 11; y++) {
+    for (let y = 5; y < 11; y++) {
         for (var x = 5; x < 11; x++) {
             game.map[x][y][1] = "empty";
         }
     }
-    for (var y = 0; y < 12; y++) {
+    for (let y = 0; y < 12; y++) {
         for (var x = 0; x < 12; x++) {
             killEnemy(x, y);
         }
@@ -280,13 +279,11 @@ function newgame() {
     for (var iv = 0; iv < vision; iv++) {
         game.inv[iv] = item_slot;
     }
-    game.inv[0] = item_move;
+    game.inv[0] = item_pickaxe;
     game.inv[1] = item_pickaxe;
     game.inv[2] = item_pickaxe;
-    game.inv[3] = item_pickaxe;
     generateItem(item_brick);
     generateItem(item_stay);
-    00
     generateItem(item_spear);
     for (var p = 0; p < 149; p++) {
         generateItem(item_pickaxe);
@@ -436,45 +433,31 @@ function run(frame) {
 }
 
 function logic() {
-    // console.log(game.select);
+    if(cmd==null) return;
+    if (cmd.tp == "restart") {
+        newgame(game);
+    }
     if (!gameovered) {
-        if (typeof(key) === "number") {
-            game.select = key - 1;
-            console.log(key);
-        } else {
-            if (key == "select_left") {
-                if (game.select > 0) {
-                    game.select -= 1;
-                    text(game.inv[game.select].text);
-                }
-                key = false;
-            }
-            if (key == "select_right") {
-                if (game.select < vision - 1) {
-                    game.select += 1;
-                    text(game.inv[game.select].text);
-                }
-                key = false;
-            }
-            if (key == "left") {
-                action(-1, 0, game.inv[game.select].name);
-            }
-            if (key == "up") {
-                action(0, -1, game.inv[game.select].name);
-            }
-            if (key == "right") {
-                action(1, 0, game.inv[game.select].name);
-            }
-            if (key == "down") {
-                action(0, 1, game.inv[game.select].name);
-            }
-            if (key == "sleep") {
-                action(0, 0, game.inv[game.select].name);
-            }
+        let act = null;
+        if(cmd.tp == "use"){
+            act = game.inv[game.select].name;
+        }else if(cmd.tp == "move"){
+            act = "move";
+        }else return;
+        if (cmd.dir == "left") {
+            action(-1, 0, act);
         }
-    } else {
-        if (key == "enter") {
-            newgame(game);
+        if (cmd.dir == "up") {
+            action(0, -1, act);
+        }
+        if (cmd.dir == "right") {
+            action(1, 0, act);
+        }
+        if (cmd.dir == "down") {
+            action(0, 1, act);
+        }
+        if (cmd.dir == "sleep") {
+            action(0, 0, act);
         }
     }
 
