@@ -70,6 +70,15 @@ const img_goldenkey = new Image();
 img_goldenkey.src = 'img/goldenkey.png';
 const img_blackkey = new Image();
 img_blackkey.src = 'img/blackkey.png';
+const img_left = new Image();
+img_left.src = 'img/left.png';
+const img_right = new Image();
+img_right.src = 'img/right.png';
+const img_up = new Image();
+img_up.src = 'img/up.png';
+const img_down = new Image();
+img_down.src = 'img/down.png';
+
 
 const item_move={name:"move", img:img_move, text:"Старые ботинки, WASD чтобы ходить."};
 const item_slot={name:"slot", img:img_slot, text:"Уголок сердца Героя, его можно заполнить любимыми предметами или болью и страданиями."};
@@ -85,15 +94,16 @@ const item_burdock={name:"burdock", img:img_burdock, text:"Пристал реп
 const item_redburdock={name:"redburdock", img:img_redburdock, text:"Репей главного хищного растения."};
 const item_drawn={name:"drawn", img:img_drawn, text:"Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"};
 
-const item_redkey={name:"redkey", img:img_redkey, text:"Один из девяти ключей открывающих портал домой"};
-const item_goldenkey={name:"goldenkey", img:img_goldenkey, text:"Один из девяти ключей открывающих портал домой"};
-const item_whitekey={name:"whitekey", img:img_whitekey, text:"Один из девяти ключей открывающих портал домой"};
-const item_blackkey={name:"blackkey", img:img_blackkey, text:"Один из девяти ключей открывающих портал домой"};
-const item_greenkey={name:"greenkey", img:img_greenkey, text:"Один из девяти ключей открывающих портал домой"};
-const item_bluekey={name:"bluekey", img:img_bluekey, text:"Один из девяти ключей открывающих портал домой"};
-const item_rainkey={name:"rainkey", img:img_rainkey, text:"Один из девяти ключей открывающих портал домой"};
-const item_magentakey={name:"magentakey", img:img_magentakey, text:"Один из девяти ключей открывающих портал домой"};
-const item_miragekey={name:"miragekey", img:img_miragekey, text:"Один из девяти ключей открывающих портал домой"};
+const item_redkey={name:"key", img:img_redkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_goldenkey={name:"key", img:img_goldenkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_whitekey={name:"key", img:img_whitekey, text:"Один из девяти ключей открывающих портал домой"};
+const item_blackkey={name:"key", img:img_blackkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_greenkey={name:"key", img:img_greenkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_bluekey={name:"key", img:img_bluekey, text:"Один из девяти ключей открывающих портал домой"};
+const item_rainkey={name:"key", img:img_rainkey, text:"Один из девяти ключей открывающих портал домой"};
+const item_magentakey={name:"key", img:img_magentakey, text:"Один из девяти ключей открывающих портал домой"};
+const item_miragekey={name:"key", img:img_miragekey, text:"Один из девяти ключей открывающих портал домой"};
+
 
 var game={};
 var dh=0;
@@ -101,7 +111,8 @@ const vision=9;
 
 var gameovered=false;
 var add_monster = 0;
-var localEnemy=[];
+// var localEnemy=[];
+var allKeys=[];
 
 var stamp=0;
 var key=0;
@@ -183,27 +194,37 @@ function generateMonster(img,x,y){
 function newgame(){
 	gameovered=false;
 	add_monster=0;
-	var generatedItems=[];
-	var generateItemCounter=0;
-
+	allKeys=[];
+	var rndItem=[];
+	var rndItemCounter=0;
+	for(var y=6; y<45; y++){
+		for(var x=6; x<45; x++){
+			rndItem[rndItemCounter]={a:x,b:y};;
+			rndItemCounter++;
+		}
+	}
 	for(var y=0; y<50; y++){
-		for(var x=0; x<50; x++){
+		for(var x=0; x<50; x++){		
 			for(var z=0; z<3; z++){ 
     			game.map[x][y][z] = "empty";
     		}
     	}
     }
     for(var y=0; y<50; y++){
-    	for(var x=0; x<50; x++){ 
-    		if(rndint(0,99)<25){
+    	for(var x=0; x<50; x++){
+    		if (y<15){
     			game.map[x][y][0] = img_floor;
-    			if (x>1&&y>1){
-	    			game.map[x-1][y][0] = img_floor;
-	    			game.map[x][y-1][0] = img_floor;
-	    			game.map[x-1][y-1][0] = img_floor;
-    			}
-    		}else{
-    			game.map[x][y][0] = img_water;
+    		}else{ 
+	    		if(rndint(0,99)<25){
+	    			game.map[x][y][0] = img_floor;
+	    			if (x>1&&y>1){
+		    			game.map[x-1][y][0] = img_floor;
+		    			game.map[x][y-1][0] = img_floor;
+		    			game.map[x-1][y-1][0] = img_floor;
+	    			}
+	    		}else{
+	    			game.map[x][y][0] = img_water;
+	    		}
     		}
     		if(rndint(0,4)==0){
     			game.map[x][y][1] = img_wall;
@@ -219,9 +240,10 @@ function newgame(){
     		}	
 		}
 	}
-	game.map[35][35][0] = img_stairs;	
-	game.map[35][35][1] = "empty";	
+	// game.map[35][35][0] = img_stairs;	
+	// game.map[35][35][1] = "empty";	
 	game.enemy=[];
+
 	var ghosts=15;
 	for (j=0;j<90;j++){
 		var a=rndint(5,45);
@@ -255,9 +277,9 @@ function newgame(){
 	var a=rndint(11,39);
 	var b=rndint(11,39);
 	generateMonster(img_motherplant,a,b);
-	// a=rndint(11,39);
-	// b=rndint(11,39);
-	// generateMonster(img_motherplant,a,b);
+	a=rndint(11,39);
+	b=rndint(11,39);
+	generateMonster(img_motherplant,a,b);
 
     for(var y=5; y<11; y++){
 		for(var x=5; x<11; x++){
@@ -282,15 +304,9 @@ function newgame(){
 	game.inv[1]=item_pickaxe;
 	game.inv[2]=item_pickaxe;
 	game.inv[3]=item_pickaxe;
-	a=rndint(11,39);
-	b=rndint(11,39);
-	game.map[a][b][2] = item_brick;
-	a=rndint(6,45);
-	b=rndint(6,45);
-	game.map[a][b][2] = item_stay;
-	a=rndint(6,45);
-	b=rndint(6,45);
-	game.map[a][b][2] = item_spear;
+	generateItem(item_brick);
+	generateItem(item_stay);00
+	generateItem(item_spear);
 	for (var p=0;p<99;p++){
 		generateItem(item_pickaxe);
 	}
@@ -305,25 +321,17 @@ function newgame(){
 	generateItem(item_rainkey);
 
 	function generateItem(item){
-		console.log("generate!");
-		if (generateItemCounter<100){
-			var a=rndint(6,45);
-			var b=rndint(6,45);
-			// if(generatedItems[z][0]!==a && generatedItems[z][1]!==b){
-			    generatedItems[generatedItems.length]=[a,b];
-				game.map[a][b][2] = item;
-				console.log("new item");
-			// }else{
-			// 	generateItem(item,a,b);
-			// 	generateItemCounter++;
-			// 	console.log("deny");
-			// }
-	    }else{
-	    	console.log("ошибка при генерации предметов");
-	    }
+	    var m = rndint(0,rndItem.length)
+		var a = rndItem[m].a;
+		var b = rndItem[m].b;
+		rndItem[m].splice;
+		game.map[a][b][2] = item;
+		if(item.name=="key"){
+			allKeys[allKeys.length]={x:a,y:b, img:item.img};
+			// console.log("addkey");
+		}
+		generateItemCounter=0;
 	}
-
-	
 	return game;
 }
 
@@ -374,7 +382,6 @@ function draw(frame){
 		var dy = fy+(y-fy)*p/100;
 		drawimg(img_from,x,y);
 		drawimg(i,dx,dy);
-
 	}
 	resize();
 	if (stamp<=100){
@@ -389,93 +396,6 @@ function draw(frame){
 			game.fow[x][y]=false;
 		}
 	}
-	//fow
-	for(var y=0; y<9; y++){
-		for(var x=0; x<9; x++){
-			if (imfp(posx+x,posy+y,1,game)==img_wall){
-				if(x<4 && y==4){
-					 	var a=x;
-						while(a>0){
-						a--;
-						game.fow[a][4]=true;
-						game.fow[a][5]=true;
-						game.fow[a][3]=true;
-					}
-				}
-				if(x>4 && y==4){
-					 	var a=x;
-						while(a<8){
-						a++;
-						game.fow[a][4]=true;
-						game.fow[a][5]=true;
-						game.fow[a][3]=true;
-					}
-				}
-				if(x==4 && y<4){
-					 	var a=y;
-						while(a>0){
-						a--;
-						game.fow[4][a]=true;
-						game.fow[5][a]=true;
-						game.fow[3][a]=true;
-					}
-				}
-				if(x==4 && y>4){
-					 	var a=y;
-						while(a<8){
-						a++;
-						game.fow[4][a]=true;
-						game.fow[5][a]=true;
-						game.fow[3][a]=true;
-					}
-				}
-				if (x>=4&&y>=4){
-					var a=x;
-					var b=y;
-					while(a<8 && b<8){
-						a++;
-						b++;
-						game.fow[a][b]=true;
-						if(x<=y){game.fow[a-1][b]=true};
-						if(x>=y){game.fow[a][b-1]=true};
-					}
-				}
-				if (x>=4&&y<=4){
-					var a=x;
-					var b=y;
-					while(a>0 && a<8 && b>0 && b<8){
-						a++;
-						b--;
-						game.fow[a][b]=true;
-						if(x+y<=8){game.fow[a-1][b]=true};
-						if(x+y>=8){game.fow[a][b+1]=true};
-					}
-				}
-				if (x<=4&&y<=4){
-					var a=x;
-					var b=y;
-					while(a>0 && a<8 && b>0 && b<8){
-						a--;
-						b--;
-						game.fow[a][b]=true;
-						if(x>=y){game.fow[a+1][b]=true};
-						if(x<=y){game.fow[a][b+1]=true};
-					}
-				}
-				if (x<=4&&y>=4){
-					var a=x;
-					var b=y;
-					while(a>0 && a<8 && b>0 && b<8){
-						a--;
-						b++;
-						game.fow[a][b]=true;
-						if(x+y>=8){game.fow[a+1][b]=true};
-						if(x+y<=8){game.fow[a][b-1]=true};
-					}
-				}
-			}
-		} 		
-	}	
 	
 	
 	for(var z=0; z<3; z++){
@@ -496,7 +416,6 @@ function draw(frame){
 			 	}	
 			}
 		}
-		
 	}
 
 	if (!gameovered){drawimg(img_hero,4,4);}else{
@@ -516,6 +435,19 @@ function draw(frame){
     			drawimg(img_fow,x,y);
     		}	
     	}
+    }
+
+    if(game.arrow=="left"){
+    	drawimg(img_left,3,4);
+    }
+    if(game.arrow=="right"){
+    	drawimg(img_right,5,4);
+    }
+    if(game.arrow=="down"){
+    	drawimg(img_down,4,5);
+    }
+    if(game.arrow=="up"){
+    	drawimg(img_up,4,3);
     }
 
 }
@@ -562,6 +494,118 @@ function logic(){
 		}
 	}
 
+	var min = 0;
+		for(var n in allKeys){
+		if (Math.abs(game.pos.x-allKeys[n].x+game.pos.y-allKeys[n].y)<Math.abs(game.pos.x-allKeys[min].x+game.pos.y-allKeys[min].y)){
+			min=n;
+			}
+		}
+		if(Math.abs(allKeys[min].x-game.pos.x)>Math.abs(allKeys[min].y-game.pos.y)){
+			if (allKeys[min].x-game.pos.x<0){
+				game.arrow="left";
+			}else{
+				game.arrow="right";
+			}
+		}else{
+			if (allKeys[min].y-game.pos.y<0){
+				game.arrow="up";
+			}else{
+				game.arrow="down";
+			}
+		}
+
+
+		//fow
+		var posx=game.pos.x-(vision-1)/2;
+		var posy=game.pos.y-(vision-1)/2;
+		for(var y=0; y<9; y++){
+			for(var x=0; x<9; x++){
+				if (imfp(posx+x,posy+y,1,game)==img_wall){
+					if(x<4 && y==4){
+						 	var a=x;
+							while(a>0){
+							a--;
+							game.fow[a][4]=true;
+							game.fow[a][5]=true;
+							game.fow[a][3]=true;
+						}
+					}
+					if(x>4 && y==4){
+						 	var a=x;
+							while(a<8){
+							a++;
+							game.fow[a][4]=true;
+							game.fow[a][5]=true;
+							game.fow[a][3]=true;
+						}
+					}
+					if(x==4 && y<4){
+						 	var a=y;
+							while(a>0){
+							a--;
+							game.fow[4][a]=true;
+							game.fow[5][a]=true;
+							game.fow[3][a]=true;
+						}
+					}
+					if(x==4 && y>4){
+						 	var a=y;
+							while(a<8){
+							a++;
+							game.fow[4][a]=true;
+							game.fow[5][a]=true;
+							game.fow[3][a]=true;
+						}
+					}
+					if (x>=4&&y>=4){
+						var a=x;
+						var b=y;
+						while(a<8 && b<8){
+							a++;
+							b++;
+							game.fow[a][b]=true;
+							if(x<=y){game.fow[a-1][b]=true};
+							if(x>=y){game.fow[a][b-1]=true};
+						}
+					}
+					if (x>=4&&y<=4){
+						var a=x;
+						var b=y;
+						while(a>0 && a<8 && b>0 && b<8){
+							a++;
+							b--;
+							game.fow[a][b]=true;
+							if(x+y<=8){game.fow[a-1][b]=true};
+							if(x+y>=8){game.fow[a][b+1]=true};
+						}
+					}
+					if (x<=4&&y<=4){
+						var a=x;
+						var b=y;
+						while(a>0 && a<8 && b>0 && b<8){
+							a--;
+							b--;
+							game.fow[a][b]=true;
+							if(x>=y){game.fow[a+1][b]=true};
+							if(x<=y){game.fow[a][b+1]=true};
+						}
+					}
+					if (x<=4&&y>=4){
+						var a=x;
+						var b=y;
+						while(a>0 && a<8 && b>0 && b<8){
+							a--;
+							b++;
+							game.fow[a][b]=true;
+							if(x+y>=8){game.fow[a+1][b]=true};
+							if(x+y<=8){game.fow[a][b-1]=true};
+						}
+					}
+				}
+			} 		
+		}
+		
+
 	function canMove(a,b){
 		if(game.map[game.pos.x+a][game.pos.y+b][1]!="empty"){
 					text("Препятствие!");
@@ -605,6 +649,13 @@ function logic(){
 				}
 				if(game.map[game.pos.x][game.pos.y][2]!="empty"){
 					addItem(game.map[game.pos.x][game.pos.y][2],true);
+					if(game.map[game.pos.x][game.pos.y][2].name=="key"){
+						console.log("splice");
+						for (k in allKeys){
+							if(allKeys[k].img==game.map[game.pos.x][game.pos.y][2].img){
+								allKeys.splice(k,1);							}
+						}
+					}
 					game.map[game.pos.x][game.pos.y][2]="empty";
 				}
 				enemyturn();
@@ -896,24 +947,38 @@ function enemyInPos(x,y){
 
 function addItem(item,good){
 	var ok = true;
-	if(good){
-		for (var i in game.inv){
-			if(game.inv[i].name=="slot" && ok){
-				game.inv[i]=item;
-				ok=false;
-			}
-		}
-	}else{
-		for (var i in game.inv){
-			// console.log(game.inv.length-i-1);
-			if(game.inv[game.inv.length-i-1].name=="slot" && ok){
+	var okkey = true;
+	if(item.name=="key"){
+		for(var i in game.inv){
+			if(okkey && game.inv[game.inv.length-i-1].name!="key"){
 				game.inv[game.inv.length-i-1]=item;
-				ok=false;
+				okkey=false;
 			}
 		}
+	if(okkey){
+		gameover(true);
 	}
-	if(ok){
-		text("Герой не может вынести большего груза боли старадний и артефактов...");
-		gameover(false);
+	}else{
+
+		if(good){
+			for (var i in game.inv){
+				if(game.inv[i].name=="slot" && ok){
+					game.inv[i]=item;
+					ok=false;
+				}
+			}
+		}else{
+			for (var i in game.inv){
+				// console.log(game.inv.length-i-1);
+				if(game.inv[game.inv.length-i-1].name=="slot" && ok){
+					game.inv[game.inv.length-i-1]=item;
+					ok=false;
+				}
+			}
+		}
+		if(ok){
+			text("Герой не может вынести большего груза боли старадний и артефактов...");
+			gameover(false);
+		}
 	}
 }
