@@ -17,9 +17,7 @@ const item_pickaxe = {name: "pickaxe", text: "Кирка, крушит стен�
 const wound_bite = {name: "bite", text: "Серьезный укус, нужно забинтовать рану."};
 const wound_life = {name: "life", text: "Уголок сердца Героя, его можно заполнить болью и страданиями."};
 
-const item_burdock = {
-    name: "burdock",
-    text: "Пристал репей, не думаю что стоит бросать его на землю..."
+const item_burdock = {name: "burdock", text: "Пристал репей, не думаю что стоит бросать его на землю..."
 };
 const item_redburdock = {name: "redburdock", text: "Репей главного хищного растения."};
 const wound_drawn = {
@@ -46,6 +44,8 @@ var gameovered = false;
 var add_monster = 0;
 var logictimer=0;
 var allKeys = [];
+var rndItem = [];
+var rndItemCounter = 0;
 
 var stamp = 0;
 var cmd = null;
@@ -167,6 +167,12 @@ function init() {
             game.fow[x][y] = false;
         }
     }
+    for (var y = 6; y < 45; y++) {
+        for (var x = 6; x < 45; x++) {
+            rndItem[rndItemCounter] = {a: x, b: y};
+            rndItemCounter++;
+        }
+    }
 
     return newgame();
 }
@@ -180,14 +186,6 @@ function newgame() {
     gameovered = false;
     add_monster = 0;
     allKeys = [];
-    var rndItem = [];
-    var rndItemCounter = 0;
-    for (var y = 6; y < 45; y++) {
-        for (var x = 6; x < 45; x++) {
-            rndItem[rndItemCounter] = {a: x, b: y};
-            rndItemCounter++;
-        }
-    }
     for (var y = 0; y < 50; y++) {
         for (var x = 0; x < 50; x++) {
             for (var z = 0; z < 3; z++) {
@@ -211,12 +209,10 @@ function newgame() {
                     game.map[x][y][0] = "water";
                 }
             }
-            if (rndint(0, 4) == 0) {
-                game.map[x][y][1] = "wall";
-            }
-            if ((y == 13 || y == 14) && (x !== 40 && x !== 41)) {
-                game.map[x][y][1] = "wall"
-            }
+            // if (rndint(0, 4) == 0) {
+            //     game.map[x][y][1] = "wall";
+            // }
+            
             if (x < 5 || x >= 45) {
                 game.map[x][y][1] = "rock";
             }
@@ -225,8 +221,33 @@ function newgame() {
             }
         }
     }
-    // game.map[35][35][0] = "stairs";
-    // game.map[35][35][1] = "empty";
+    
+    var a=rndint(15, 35);
+    var b=rndint(15, 35);
+    if(rndint(0,1)==1){
+		for (var a;a < 45;a++){
+			if (a<45) {
+		    game.map[a][b][1] = "wall";
+		    game.map[a][b+1][1] = "wall";
+			}
+		}
+	}else{
+		for (var b;b < 45; b++){
+			if (b<45) {
+		    game.map[a][b][1] = "wall";
+		    game.map[a+1][b][1] = "wall";
+			}
+		}
+	}
+
+	for (var z=0;z<150;z++){
+		a=rndint(7, 42);
+	    b=rndint(7, 42);
+		genPat("tower",a,b);
+		console.log(a,b);
+	}
+    
+
     game.enemy = [];
 
     var ghosts = 15;
@@ -262,20 +283,31 @@ function newgame() {
     var a = rndint(11, 39);
     var b = rndint(11, 39);
     generateMonster("motherplant", a, b);
+    a = rndint(11, 39);
+    b = rndint(11, 39);
+    generateMonster("motherplant", a, b);
+    a = rndint(11, 39);
+    b = rndint(11, 39);
+    generateMonster("motherplant", a, b);
 
-    // for (let y = 5; y < 11; y++) {
-    //     for (var x = 5; x < 11; x++) {
-    //         game.map[x][y][1] = "empty";
-    //     }
-    // }
-    // for (let y = 0; y < 12; y++) {
-    //     for (var x = 0; x < 12; x++) {
-    //         killEnemy(x, y);
-    //     }
-    // }
+    for (let y = 5; y < 11; y++) {
+        for (var x = 5; x < 11; x++) {
+            game.map[x][y][1] = "empty";
+        }
+    }
+    for (let y = 0; y < 12; y++) {
+        for (var x = 0; x < 12; x++) {
+            killEnemy(x, y);
+        }
+    }
+	a= rndint(6, 44);
+	b= rndint(6, 44);
+    game.pos = {x: a, y: b};
 
-    game.pos = {x: rndint(6, 44), y: rndint(6, 44)};
+    
+    genPat("tower",game.pos.x,game.pos.y);
     text("Началась новая игра. WASD чтобы ходить. Цифры, чтобы выбирать предметы. Стрелки чтобы использовать предметы. SPACE чтобы стоять на месте")
+    fow();
 
     game.select = 0;
     game.inv = [];
@@ -291,7 +323,7 @@ function newgame() {
     // game.inv[4] = item_pickaxe;
     generateItem(item_brick);
     generateItem(item_stay);
-    generateItem(item_spear);
+    // generateItem(item_spear);
     for (var p = 0; p < 49; p++) {
         generateItem(item_pickaxe);
     }
@@ -490,144 +522,27 @@ function logic(frame) {
     cmd = null;
 
     var min = 0;
-    for (var n in allKeys) {
-        if (Math.abs(game.pos.x - allKeys[n].x + game.pos.y - allKeys[n].y) < Math.abs(game.pos.x - allKeys[min].x + game.pos.y - allKeys[min].y)) {
-            min = n;
-        }
+    if (allKeys.length!=0){
+	    for (var n in allKeys) {
+	        if (Math.abs(game.pos.x - allKeys[n].x + game.pos.y - allKeys[n].y) < Math.abs(game.pos.x - allKeys[min].x + game.pos.y - allKeys[min].y)) {
+	            min = n;
+	        }
+	    }
+	    if (Math.abs(allKeys[min].x - game.pos.x) > Math.abs(allKeys[min].y - game.pos.y)) {
+	        if (allKeys[min].x - game.pos.x < 0) {
+	            game.arrow = "left";
+	        } else {
+	            game.arrow = "right";
+	        }
+	    } else {
+	        if (allKeys[min].y - game.pos.y < 0) {
+	            game.arrow = "up";
+	        } else {
+	            game.arrow = "down";
+	        }
+	    }
     }
-    if (Math.abs(allKeys[min].x - game.pos.x) > Math.abs(allKeys[min].y - game.pos.y)) {
-        if (allKeys[min].x - game.pos.x < 0) {
-            game.arrow = "left";
-        } else {
-            game.arrow = "right";
-        }
-    } else {
-        if (allKeys[min].y - game.pos.y < 0) {
-            game.arrow = "up";
-        } else {
-            game.arrow = "down";
-        }
-    }
-
-
-    //fow
-    var posx = game.pos.x - (vision - 1) / 2;
-    var posy = game.pos.y - (vision - 1) / 2;
-    for (var y = 0; y < 9; y++) {
-        for (var x = 0; x < 9; x++) {
-            game.fow[x][y] = false;
-        }
-    }
-    for (var y = 0; y < 9; y++) {
-        for (var x = 0; x < 9; x++) {
-            if (imfp(posx + x, posy + y, 1, game) == "wall") {
-                if (x < 4 && y == 4) {
-                    var a = x;
-                    while (a > 0) {
-                        a--;
-                        game.fow[a][4] = true;
-                        game.fow[a][5] = true;
-                        game.fow[a][3] = true;
-                    }
-                }
-                if (x > 4 && y == 4) {
-                    var a = x;
-                    while (a < 8) {
-                        a++;
-                        game.fow[a][4] = true;
-                        game.fow[a][5] = true;
-                        game.fow[a][3] = true;
-                    }
-                }
-                if (x == 4 && y < 4) {
-                    var a = y;
-                    while (a > 0) {
-                        a--;
-                        game.fow[4][a] = true;
-                        game.fow[5][a] = true;
-                        game.fow[3][a] = true;
-                    }
-                }
-                if (x == 4 && y > 4) {
-                    var a = y;
-                    while (a < 8) {
-                        a++;
-                        game.fow[4][a] = true;
-                        game.fow[5][a] = true;
-                        game.fow[3][a] = true;
-                    }
-                }
-                if (x >= 4 && y >= 4) {
-                    var a = x;
-                    var b = y;
-                    while (a < 8 && b < 8) {
-                        a++;
-                        b++;
-                        game.fow[a][b] = true;
-                        if (x <= y) {
-                            game.fow[a - 1][b] = true
-                        }
-                        ;
-                        if (x >= y) {
-                            game.fow[a][b - 1] = true
-                        }
-                        ;
-                    }
-                }
-                if (x >= 4 && y <= 4) {
-                    var a = x;
-                    var b = y;
-                    while (a > 0 && a < 8 && b > 0 && b < 8) {
-                        a++;
-                        b--;
-                        game.fow[a][b] = true;
-                        if (x + y <= 8) {
-                            game.fow[a - 1][b] = true
-                        }
-                        ;
-                        if (x + y >= 8) {
-                            game.fow[a][b + 1] = true
-                        }
-                        ;
-                    }
-                }
-                if (x <= 4 && y <= 4) {
-                    var a = x;
-                    var b = y;
-                    while (a > 0 && a < 8 && b > 0 && b < 8) {
-                        a--;
-                        b--;
-                        game.fow[a][b] = true;
-                        if (x >= y) {
-                            game.fow[a + 1][b] = true
-                        }
-                        ;
-                        if (x <= y) {
-                            game.fow[a][b + 1] = true
-                        }
-                        ;
-                    }
-                }
-                if (x <= 4 && y >= 4) {
-                    var a = x;
-                    var b = y;
-                    while (a > 0 && a < 8 && b > 0 && b < 8) {
-                        a--;
-                        b++;
-                        game.fow[a][b] = true;
-                        if (x + y >= 8) {
-                            game.fow[a + 1][b] = true
-                        }
-                        ;
-                        if (x + y <= 8) {
-                            game.fow[a][b - 1] = true
-                        }
-                        ;
-                    }
-                }
-            }
-        }
-    }
+    fow();
 
 
     function canMove(a, b) {
@@ -673,7 +588,6 @@ function logic(frame) {
                     }
                 }
                 if (game.map[game.pos.x][game.pos.y][2] != "empty") {
-                    addItem(game.map[game.pos.x][game.pos.y][2], true);
                     if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
                         for (k in allKeys) {
                             if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
@@ -681,6 +595,7 @@ function logic(frame) {
                             }
                         }
                     }
+                    addItem(game.map[game.pos.x][game.pos.y][2], true);
                     game.map[game.pos.x][game.pos.y][2] = "empty";
                 }
                 enemyturn();
@@ -704,6 +619,7 @@ function logic(frame) {
         }
         if (act === "burdock") {
             if (game.map[game.pos.x + a][game.pos.y + b][1] == "empty" && (a != 0 || b != 0)) {
+            	killEnemy(game.pos.x + a, game.pos.y + b);
                 generateMonster("plant", game.pos.x + a, game.pos.y + b);
                 text("Растет как на дрожащ!");
                 game.inv[game.select] = item_slot;
@@ -714,6 +630,7 @@ function logic(frame) {
         }
         if (act === "redburdock") {
             if (game.map[game.pos.x + a][game.pos.y + b][1] == "empty" && (a != 0 || b != 0)) {
+            	killEnemy(game.pos.x + a, game.pos.y + b);
                 generateMonster("motherplant", game.pos.x + a, game.pos.y + b);
                 text("Растет как на дрожащ!");
                 game.inv[game.select] = item_slot;
@@ -737,7 +654,7 @@ function logic(frame) {
                         	game.map[x + a * i][y + b * i][2] = item_spear;
                         }
                         ok = false;
-                        game.select = 0;
+                        // game.select = 0;
                     }
                 }
                 enemyturn();
@@ -780,8 +697,9 @@ function logic(frame) {
         function move(a, b, monster) {
             var wound = wound_bite;
             var wound2 = false;
+            var item = item_slot;
             if (monster.name == "plant") {
-                wound = item_burdock
+                item = item_burdock;
             }
             if (monster.name == "motherplant") {
                 wound = item_redburdock;
@@ -807,9 +725,10 @@ function logic(frame) {
             if (enemy.x == game.pos.x && enemy.y == game.pos.y) {
                 text("Героя серьезно укусили");
                 killEnemy(enemy.x, enemy.y);
-                addWound(wound, false);
+                addItem(item);
+                addWound(wound);
                 if (wound2 != false) {
-                    addWound(wound2, false);
+                    addWound(wound2);
                 }
             }
             if (game.map[enemy.x][enemy.y][0] == "trap"){
@@ -838,23 +757,19 @@ function logic(frame) {
         }
 
         for (var enemy of game.enemy) {
-        	if (game.map[enemy.x][enemy.y][0] == "trap"){
-        		text("Кто-то попался в капкан при перекличке");
-            	killEnemy(enemy.x, enemy.y);
-				game.map[enemy.x][enemy.y][0]="floor";
-            }
             var px = enemy.x - game.pos.x + 4;
             var py = enemy.y - game.pos.y + 4;
             enemy.fromx = enemy.x;
             enemy.fromy = enemy.y;
             if (enemy.alive){
-	            if (enemy.name == "motherplant") {
-	                var a = rndint(1, 49);
-	                var b = rndint(1, 49);
-	                text("Герой слышит вой новорожденного плотоядного растения ");
+	            if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
+	            	if (enemy.name == "motherplant") {
+	                var a = rndint(enemy.x-9, enemy.x+9);
+	                var b = rndint(enemy.y-9, enemy.y+9);
 	                if (!((a == game.pos.x || a == game.pos.x - 1 || a == game.pos.x + 1) && (b == game.pos.y || b == game.pos.y - 1 || b == game.pos.y + 1))) {
 	                    if (game.map[a][b][1] == "empty" && enemyInPos(a, b) == 0) {
 	                        generateMonster("plant", a, b);
+	                        text("Герой слышит вой новорожденного плотоядного растения ");
 	                    }
 	                }
 
@@ -874,7 +789,6 @@ function logic(frame) {
 	                    }
 	                }
 	            }
-	            if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
 
 	                if (enemy.name == "plant") {
 	                    var n = near(game.pos.x, game.pos.y, enemy.x, enemy.y);
@@ -1024,13 +938,11 @@ function addItem(item) {
     var ok = true;
     var okkey = true;
     if (item.typ == "key") {
-        for (var i in game.inv) {
-            if (okkey && game.inv[game.inv.length - i - 1].typ !== "key") {
-            	text("Вы нашли КЛЮЧ!");
-                // game.inv[game.inv.length - i - 1] = item;
-                okkey = false;
-            }
-        }
+       text("Вы нашли КЛЮЧ!");
+       text(allKeys.length);
+       if(allKeys.length==0){
+       	gameover(true);
+       }
     } else {
         for (var i in game.inv) {
             if (game.inv[i].name == "slot" && ok) {
@@ -1042,4 +954,137 @@ function addItem(item) {
             text("Герой не может вынести большего груза артефактов...");
         }
     }
+}
+
+function fow(){
+	//fow
+    var posx = game.pos.x - (vision - 1) / 2;
+    var posy = game.pos.y - (vision - 1) / 2;
+    for (var y = 0; y < 9; y++) {
+        for (var x = 0; x < 9; x++) {
+            game.fow[x][y] = false;
+        }
+    }
+    for (var y = 0; y < 9; y++) {
+        for (var x = 0; x < 9; x++) {
+            if (imfp(posx + x, posy + y, 1, game) == "wall") {
+                if (x < 4 && y == 4) {
+                    var a = x;
+                    while (a > 0) {
+                        a--;
+                        game.fow[a][4] = true;
+                        game.fow[a][5] = true;
+                        game.fow[a][3] = true;
+                    }
+                }
+                if (x > 4 && y == 4) {
+                    var a = x;
+                    while (a < 8) {
+                        a++;
+                        game.fow[a][4] = true;
+                        game.fow[a][5] = true;
+                        game.fow[a][3] = true;
+                    }
+                }
+                if (x == 4 && y < 4) {
+                    var a = y;
+                    while (a > 0) {
+                        a--;
+                        game.fow[4][a] = true;
+                        game.fow[5][a] = true;
+                        game.fow[3][a] = true;
+                    }
+                }
+                if (x == 4 && y > 4) {
+                    var a = y;
+                    while (a < 8) {
+                        a++;
+                        game.fow[4][a] = true;
+                        game.fow[5][a] = true;
+                        game.fow[3][a] = true;
+                    }
+                }
+                if (x >= 4 && y >= 4) {
+                    var a = x;
+                    var b = y;
+                    while (a < 8 && b < 8) {
+                        a++;
+                        b++;
+                        game.fow[a][b] = true;
+                        if (x <= y) {
+                            game.fow[a - 1][b] = true
+                        }
+                        ;
+                        if (x >= y) {
+                            game.fow[a][b - 1] = true
+                        }
+                        ;
+                    }
+                }
+                if (x >= 4 && y <= 4) {
+                    var a = x;
+                    var b = y;
+                    while (a > 0 && a < 8 && b > 0 && b < 8) {
+                        a++;
+                        b--;
+                        game.fow[a][b] = true;
+                        if (x + y <= 8) {
+                            game.fow[a - 1][b] = true
+                        }
+                        ;
+                        if (x + y >= 8) {
+                            game.fow[a][b + 1] = true
+                        }
+                        ;
+                    }
+                }
+                if (x <= 4 && y <= 4) {
+                    var a = x;
+                    var b = y;
+                    while (a > 0 && a < 8 && b > 0 && b < 8) {
+                        a--;
+                        b--;
+                        game.fow[a][b] = true;
+                        if (x >= y) {
+                            game.fow[a + 1][b] = true
+                        }
+                        ;
+                        if (x <= y) {
+                            game.fow[a][b + 1] = true
+                        }
+                        ;
+                    }
+                }
+                if (x <= 4 && y >= 4) {
+                    var a = x;
+                    var b = y;
+                    while (a > 0 && a < 8 && b > 0 && b < 8) {
+                        a--;
+                        b++;
+                        game.fow[a][b] = true;
+                        if (x + y >= 8) {
+                            game.fow[a + 1][b] = true
+                        }
+                        ;
+                        if (x + y <= 8) {
+                            game.fow[a][b - 1] = true
+                        }
+                        ;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function genPat(pattern,a,b){
+    var wallarr = [{x:a-2,y:b-2},{x:a-1,y:b-2},{x:a+1,y:b-2},{x:a+2,y:b-2},{x:a-2,y:b-1},{x:a-2,y:b+1},{x:a-2,y:b+2},{x:a-1,y:b+2},{x:a+1,y:b+2},{x:a+2,y:b+2},{x:a+2,y:b+1},{x:a+2,y:b-1}];
+    for (w in wallarr){
+    	game.map[wallarr[w].x][wallarr[w].y][1] = "wall";
+    }
+    var emptyarr = [{x:a,y:b},{x:a-1,y:b-1},{x:a-1,y:b},{x:a-1,y:b+1},{x:a,y:b-1},,{x:a,y:b+1},{x:a+1,y:b-1},{x:a+1,y:b},{x:a+1,y:b+1},{x:a,y:b+2},{x:a,y:b+3},,{x:a-3,y:b},{x:a-2,y:b},{x:a,y:b-2},{x:a,y:b-3},{x:a+2,y:b},{x:a+3,y:b}];
+    for (w in emptyarr){
+    	game.map[emptyarr[w].x][emptyarr[w].y][1] = "empty";
+    }
+    	// game.map[a][b][2] = "undefined"
 }
