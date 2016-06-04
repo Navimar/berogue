@@ -88,7 +88,6 @@ window.onkeydown = function (e) {
         cmd = {tp:"move",dir: "down"};
     }
     if (e.code == "Space") {
-        game.select = 0;
         cmd = {tp:"move",dir: "sleep"};
     }
     if (e.code == "Enter") {
@@ -198,10 +197,10 @@ function newgame() {
     }
     for (var y = 0; y < 50; y++) {
         for (var x = 0; x < 50; x++) {
-            if (y < 35 && x > 15) {
+            if (y < 25 || x > 25) {
                 game.map[x][y][0] = "floor";
             } else {
-                if (rndint(0, 99) < 30) {
+                if (rndint(0, 99) < 20) {
                     	game.map[x][y][0] = "floor";
                     if (x > 1 && y > 1) {
                         game.map[x - 1][y][0] = "floor";
@@ -734,7 +733,9 @@ function logic(frame) {
                         killEnemy(x + a * i, y + b * i);
                         text("Вы пронзили врага копьем!")
                         game.inv[game.select] = item_slot;
-                        game.map[x + a * i][y + b * i][2] = item_spear;
+                        if (game.map[x + a * i][y + b * i][2].typ!="key"){
+                        	game.map[x + a * i][y + b * i][2] = item_spear;
+                        }
                         ok = false;
                         game.select = 0;
                     }
@@ -1026,12 +1027,9 @@ function addItem(item) {
         for (var i in game.inv) {
             if (okkey && game.inv[game.inv.length - i - 1].typ !== "key") {
             	text("Вы нашли КЛЮЧ!");
-                game.inv[game.inv.length - i - 1] = item;
+                // game.inv[game.inv.length - i - 1] = item;
                 okkey = false;
             }
-        }
-        if (okkey) {
-            gameover(true);
         }
     } else {
         for (var i in game.inv) {
