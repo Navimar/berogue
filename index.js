@@ -2,7 +2,7 @@ const grafio = initGrafio();
 
 const item_slot = {
     name: "slot",
-    text: "Уголок сердца Героя, его можно заполнить любимыми предметами или болью и страданиями."
+    text: "Мешочек, его можно заполнить полезными предметами."
 };
 
 const item_spear = {name: "spear", text: "Копье гоплита, метните его во врага!"};
@@ -14,13 +14,15 @@ const item_stay = {name: "stay", text: "Палочка проростания, �
 const item_pickaxe = {name: "pickaxe", text: "Кирка, крушит стены и черепа."};
 
 
-const item_bite = {name: "bite", text: "Серьезный укус, нужно забинтовать рану."};
+const wound_bite = {name: "bite", text: "Серьезный укус, нужно забинтовать рану."};
+const wound_life = {name: "life", text: "Уголок сердца Героя, его можно заполнить болью и страданиями."};
+
 const item_burdock = {
     name: "burdock",
     text: "Пристал репей, не думаю что стоит бросать его на землю..."
 };
 const item_redburdock = {name: "redburdock", text: "Репей главного хищного растения."};
-const item_drawn = {
+const wound_drawn = {
     name: "drawn",
     text: "Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"
 };
@@ -32,11 +34,8 @@ const item_blackkey = {name: "blackkey", text: "Один из девяти кл�
 const item_greenkey = {name: "greenkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
 const item_bluekey = {name: "bluekey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
 const item_rainkey = {name: "rainkey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
-const item_magentakey = {
-    name: "magentakey",
-    text: "Один из девяти ключей открывающих портал домой", typ:"key"
-};
-const item_miragekey = {name: "key", text: "Один из девяти ключей открывающих портал домой"};
+const item_magentakey = {name: "magentakey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
+const item_miragekey = {name: "miragekey", text: "Один из девяти ключей открывающих портал домой", typ:"key"};
 
 
 var game = {};
@@ -199,10 +198,10 @@ function newgame() {
     }
     for (var y = 0; y < 50; y++) {
         for (var x = 0; x < 50; x++) {
-            if (y < 15) {
+            if (y < 35 && x > 15) {
                 game.map[x][y][0] = "floor";
             } else {
-                if (rndint(0, 99) < 25) {
+                if (rndint(0, 99) < 30) {
                     	game.map[x][y][0] = "floor";
                     if (x > 1 && y > 1) {
                         game.map[x - 1][y][0] = "floor";
@@ -281,18 +280,20 @@ function newgame() {
 
     game.select = 0;
     game.inv = [];
+    game.wound =[];
     for (var iv = 0; iv < vision; iv++) {
         game.inv[iv] = item_slot;
+        game.wound[iv] = wound_life;
     }
-    game.inv[0] = item_pickaxe;
+    game.inv[0] = item_spear;
     game.inv[1] = item_pickaxe;
-    game.inv[2] = item_pickaxe;
-    game.inv[3] = item_pickaxe;
-    game.inv[4] = item_pickaxe;
+    // game.inv[2] = item_pickaxe;
+    // game.inv[3] = item_pickaxe;
+    // game.inv[4] = item_pickaxe;
     generateItem(item_brick);
     generateItem(item_stay);
     generateItem(item_spear);
-    for (var p = 0; p < 149; p++) {
+    for (var p = 0; p < 49; p++) {
         generateItem(item_pickaxe);
     }
     generateItem(item_goldenkey);
@@ -337,7 +338,7 @@ function drawimg(name, x, y) {
     if (name == "empty") return;
     if (name == undefined || name == null) nameImg = "undefined";
     const img = grafio(name);
-    if (img) ctx.drawImage(img, x * dh + 3 * dh, y * dh, dh, dh);
+    if (img) ctx.drawImage(img, x * dh + dh + 200, y * dh, dh, dh);
 }
 
 function imfp(x, y, z) {
@@ -404,11 +405,20 @@ function draw(frame) {
         drawimg("beheaded", 4, 4)
     }
 
+
     //inventory
     for (l = 0; l < vision; l++) {
-        drawimg(game.inv[l].name, vision, l);
+        drawimg(game.inv[l].name, -1, l);
+    }
+    drawimg("select", -1, game.select);
+
+    //wounds
+    for (l = 0; l < vision; l++) {
+        drawimg(game.wound[l].name, vision, l);
     }
     drawimg("select", vision, game.select);
+
+    
 
     //fow
     for (var y = 0; y < 9; y++) {
@@ -441,14 +451,14 @@ function run(frame) {
 
 
 function logic(frame) {
-	if(logictimer<1000){
+	// if(logictimer<1000){
 		// console.log("waiting"+logictimer);
-		logictimer+=frame;
-		return;
-	}
+		// logictimer+=frame;
+		// return;
+	// }
 	logictimer=0;
     if(cmd==null) {
-    	action(0, 0, "move");
+    	// action(0, 0, "move");
     	return;
     } 
     if (!gameovered) {
@@ -649,17 +659,17 @@ function logic(frame) {
                 }
                 if (game.map[game.pos.x][game.pos.y][0] == "water") {
                     text("Если и не утону, то точно задохнусь от этого зловония!");
-                    addItem(item_drawn, false);
+                    addWound(wound_drawn, false);
                 }
                 if (game.map[game.pos.x][game.pos.y][0] == "floor") {
                     var drawntext = true;
                     for (var i in game.inv) {
-                        if (game.inv[i].name == "drawn") {
+                        if (game.wound[i].name == "drawn") {
                             if (drawntext) {
                                 text("Герой обсох и обветрился, готов к еще одному заплыву!");
                                 drawntext = false;
                             }
-                            game.inv[i] = item_slot;
+                            game.wound[i] = wound_life;
                         }
                     }
                 }
@@ -698,7 +708,7 @@ function logic(frame) {
                 generateMonster("plant", game.pos.x + a, game.pos.y + b);
                 text("Растет как на дрожащ!");
                 game.inv[game.select] = item_slot;
-                enemyturn();
+                // enemyturn();
             } else {
                 text("Некуда тут");
             }
@@ -767,14 +777,14 @@ function logic(frame) {
     function enemyturn() {
         killNotAlive();
         function move(a, b, monster) {
-            var wound = item_bite;
+            var wound = wound_bite;
             var wound2 = false;
             if (monster.name == "plant") {
                 wound = item_burdock
             }
             if (monster.name == "motherplant") {
                 wound = item_redburdock;
-                wound2 = item_bite;
+                wound2 = wound_bite;
             }
 
             var nx = enemy.x + a;
@@ -796,9 +806,9 @@ function logic(frame) {
             if (enemy.x == game.pos.x && enemy.y == game.pos.y) {
                 text("Героя серьезно укусили");
                 killEnemy(enemy.x, enemy.y);
-                addItem(wound, false);
+                addWound(wound, false);
                 if (wound2 != false) {
-                    addItem(wound2, false);
+                    addWound(wound2, false);
                 }
             }
             if (game.map[enemy.x][enemy.y][0] == "trap"){
@@ -995,7 +1005,21 @@ function enemyInPos(x, y) {
     return r;
 }
 
-function addItem(item, good) {
+function addWound(item) {
+	var ok = true;
+	for (var i in game.inv) {
+        if (game.wound[i].name == "life" && ok) {
+            game.wound[i] = item;
+            ok = false;
+		}
+	}
+	if (ok) {
+	    text("Слишком много ран...");
+	    gameover(false);
+	}
+}
+
+function addItem(item) {
     var ok = true;
     var okkey = true;
     if (item.typ == "key") {
@@ -1010,26 +1034,14 @@ function addItem(item, good) {
             gameover(true);
         }
     } else {
-
-        if (good) {
-            for (var i in game.inv) {
-                if (game.inv[i].name == "slot" && ok) {
-                    game.inv[i] = item;
-                    ok = false;
-                }
-            }
-        } else {
-            for (var i in game.inv) {
-                // console.log(game.inv.length-i-1);
-                if (game.inv[game.inv.length - i - 1].name == "slot" && ok) {
-                    game.inv[game.inv.length - i - 1] = item;
-                    ok = false;
-                }
+        for (var i in game.inv) {
+            if (game.inv[i].name == "slot" && ok) {
+                game.inv[i] = item;
+                ok = false;
             }
         }
         if (ok) {
-            text("Герой не может вынести большего груза боли старадний и артефактов...");
-            gameover(false);
+            text("Герой не может вынести большего груза артефактов...");
         }
     }
 }
