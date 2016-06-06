@@ -161,9 +161,9 @@ function init() {
         }
     }
     game.fow = [];
-    for (x = -10; x < 20; x++) {
+    for (x = 0; x < 9; x++) {
         game.fow[x] = [];
-        for (y = -10; y < 20; y++) {
+        for (y = 0; y < 9; y++) {
             game.fow[x][y] = false;
         }
     }
@@ -250,45 +250,45 @@ function newgame() {
 
     game.enemy = [];
 
-    var ghosts = 15;
-    for (let j = 0; j < 90; j++) {
-        var a = rndint(5, 45);
-        var b = rndint(5, 45);
-        if (game.map[a][b][0] == "floor") {
-            generateMonster("hedgehog", a, b);
-        } else {
-            generateMonster("fish", a, b);
-        }
-    }
-    for (let j = 0; j < ghosts; j++) {
-        var a = rndint(0, 6);
-        var b = rndint(1, 49);
-        generateMonster("ghost", a, b);
-    }
-    for (let j = 0; j < ghosts; j++) {
-        var a = rndint(1, 49);
-        var b = rndint(0, 6);
-        generateMonster("ghost", a, b);
-    }
-    for (let j = 0; j < ghosts; j++) {
-        var a = rndint(45, 49);
-        var b = rndint(1, 49);
-        generateMonster("ghost", a, b);
-    }
-    for (let j = 0; j < ghosts; j++) {
-        var a = rndint(1, 49);
-        var b = rndint(45, 49);
-        generateMonster("ghost", a, b);
-    }
-    var a = rndint(11, 39);
-    var b = rndint(11, 39);
-    generateMonster("motherplant", a, b);
-    a = rndint(11, 39);
-    b = rndint(11, 39);
-    generateMonster("motherplant", a, b);
-    a = rndint(11, 39);
-    b = rndint(11, 39);
-    generateMonster("motherplant", a, b);
+    // var ghosts = 15;
+    // for (let j = 0; j < 90; j++) {
+    //     var a = rndint(5, 45);
+    //     var b = rndint(5, 45);
+    //     if (game.map[a][b][0] == "floor") {
+    //         generateMonster("hedgehog", a, b);
+    //     } else {
+    //         generateMonster("fish", a, b);
+    //     }
+    // }
+    // for (let j = 0; j < ghosts; j++) {
+    //     var a = rndint(0, 6);
+    //     var b = rndint(1, 49);
+    //     generateMonster("ghost", a, b);
+    // }
+    // for (let j = 0; j < ghosts; j++) {
+    //     var a = rndint(1, 49);
+    //     var b = rndint(0, 6);
+    //     generateMonster("ghost", a, b);
+    // }
+    // for (let j = 0; j < ghosts; j++) {
+    //     var a = rndint(45, 49);
+    //     var b = rndint(1, 49);
+    //     generateMonster("ghost", a, b);
+    // }
+    // for (let j = 0; j < ghosts; j++) {
+    //     var a = rndint(1, 49);
+    //     var b = rndint(45, 49);
+    //     generateMonster("ghost", a, b);
+    // }
+    // var a = rndint(11, 39);
+    // var b = rndint(11, 39);
+    // generateMonster("motherplant", a, b);
+    // a = rndint(11, 39);
+    // b = rndint(11, 39);
+    // generateMonster("motherplant", a, b);
+    // a = rndint(11, 39);
+    // b = rndint(11, 39);
+    // generateMonster("motherplant", a, b);
 
     for (let y = 5; y < 11; y++) {
         for (var x = 5; x < 11; x++) {
@@ -304,8 +304,13 @@ function newgame() {
 	b= rndint(6, 44);
     game.pos = {x: a, y: b};
 
-    
+    generateMonster("hedgehog", a+7, b+7);
+
     genPat("tower",game.pos.x,game.pos.y);
+    var emptyarr = [{x:a,y:b},{x:a-1,y:b-1},{x:a-1,y:b},{x:a-1,y:b+1},{x:a,y:b-1},,{x:a,y:b+1},{x:a+1,y:b-1},{x:a+1,y:b},{x:a+1,y:b+1},{x:a,y:b+2},{x:a,y:b+3},,{x:a-3,y:b},{x:a-2,y:b},{x:a,y:b-2},{x:a,y:b-3},{x:a+2,y:b},{x:a+3,y:b}];
+    for (w in emptyarr){
+    	killEnemy(emptyarr[w].x,emptyarr[w].y);
+    }
     text("Началась новая игра. WASD чтобы ходить. Цифры, чтобы выбирать предметы. Стрелки чтобы использовать предметы. SPACE чтобы стоять на месте")
     fow();
 
@@ -421,7 +426,7 @@ function draw(frame) {
     for (let e of game.enemy) {
         if (e.x - posx < vision && e.x - posx >= 0) {
             if (e.y - posy <= vision && e.y - posy >= 0) {
-                if (!game.fow[e.x - posx][e.y - posy]) {
+                if (!game.fow[e.x - posx][e.y - posy] || !game.fow[e.fromx - posx][e.fromy - posy]){
                     animate(e.name, e.x - posx, e.y - posy, e.fromx - posx, e.fromy - posy, stamp)
                     // drawimg(e.name,e.x-posx,e.y-posy);
                     // drawimg("from",e.fromx-posx,e.fromy-posy);
@@ -542,7 +547,6 @@ function logic(frame) {
 	        }
 	    }
     }
-    fow();
 
 
     function canMove(a, b) {
@@ -693,6 +697,7 @@ function logic(frame) {
     }
 
     function enemyturn() {
+    	// fow();
         killNotAlive();
         function move(a, b, monster) {
             var wound = wound_bite;
@@ -761,6 +766,22 @@ function logic(frame) {
             var py = enemy.y - game.pos.y + 4;
             enemy.fromx = enemy.x;
             enemy.fromy = enemy.y;
+            fow(); 
+            if (px >= 0 && py >= 0 && px <= 8 && py <= 8) {
+                if (!game.fow[px][py]) {
+                	text("Тебя нашел еж!");
+                    enemy.tax = game.pos.x;
+                    enemy.tay = game.pos.y;
+                    text(enemy.tax+" "+enemy.tay);
+                    text(px+" "+py);
+                    text(game.pos.x+" "+game.pos.y);
+                }else{
+                	text("Еж тебя не видит!");
+                	text(enemy.tax+" "+enemy.tay);
+                    text(px+" "+py);
+                    text(game.pos.x+" "+game.pos.y);
+                }
+            }
             if (enemy.alive){
 	            if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
 	            	if (enemy.name == "motherplant") {
@@ -803,12 +824,6 @@ function logic(frame) {
 	                    } else {
 	                        var fear = "floor";
 	                    }
-	                    if (px >= 0 && py >= 0 && px <= 9 && py <= 9) {
-	                        if (!game.fow[px][py]) {
-	                            enemy.tax = game.pos.x;
-	                            enemy.tay = game.pos.y;
-	                        }
-	                    }
 	                    var xmot = enemy.x - enemy.tax;
 	                    if (game.map[enemy.x - Math.sign(xmot)][enemy.y][1] != "empty" || game.map[enemy.x - Math.sign(xmot)][enemy.y][0] == fear) {
 	                        xmot = 0;
@@ -837,6 +852,24 @@ function logic(frame) {
 	                                }
 	                                ;
 	                            }
+	                        }
+	                    }
+	                    fow(); 
+	                    px = enemy.x - game.pos.x + 4;
+            			py = enemy.y - game.pos.y + 4;
+	                    if (px >= 0 && py >= 0 && px <= 8 && py <= 8) {
+	                        if (!game.fow[px][py]) {
+	                        	text("Тебя нашел еж после хода!");
+	                            enemy.tax = game.pos.x;
+	                            enemy.tay = game.pos.y;
+	                            text(enemy.tax+" "+enemy.tay);
+	                            text(px+" "+py);
+	                            text(game.pos.x+" "+game.pos.y);
+	                        }else{
+	                        	text("Еж тебя не видит после хода!");
+	                        	text(enemy.tax+" "+enemy.tay);
+	                            text(px+" "+py);
+	                            text(game.pos.x+" "+game.pos.y);
 	                        }
 	                    }
 	                }
@@ -874,6 +907,7 @@ function logic(frame) {
 	        }
         }
     }
+fow();
 text("--------------");
 }
 
