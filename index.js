@@ -250,45 +250,45 @@ function newgame() {
 
     game.enemy = [];
 
-    // var ghosts = 15;
-    // for (let j = 0; j < 90; j++) {
-    //     var a = rndint(5, 45);
-    //     var b = rndint(5, 45);
-    //     if (game.map[a][b][0] == "floor") {
-    //         generateMonster("hedgehog", a, b);
-    //     } else {
-    //         generateMonster("fish", a, b);
-    //     }
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(0, 6);
-    //     var b = rndint(1, 49);
-    //     generateMonster("ghost", a, b);
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(1, 49);
-    //     var b = rndint(0, 6);
-    //     generateMonster("ghost", a, b);
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(45, 49);
-    //     var b = rndint(1, 49);
-    //     generateMonster("ghost", a, b);
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(1, 49);
-    //     var b = rndint(45, 49);
-    //     generateMonster("ghost", a, b);
-    // }
-    // var a = rndint(11, 39);
-    // var b = rndint(11, 39);
-    // generateMonster("motherplant", a, b);
-    // a = rndint(11, 39);
-    // b = rndint(11, 39);
-    // generateMonster("motherplant", a, b);
-    // a = rndint(11, 39);
-    // b = rndint(11, 39);
-    // generateMonster("motherplant", a, b);
+    var ghosts = 15;
+    for (let j = 0; j < 90; j++) {
+        var a = rndint(5, 45);
+        var b = rndint(5, 45);
+        if (game.map[a][b][0] == "floor") {
+            generateMonster("hedgehog", a, b);
+        } else {
+            generateMonster("fish", a, b);
+        }
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(0, 6);
+        var b = rndint(1, 49);
+        generateMonster("ghost", a, b);
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(1, 49);
+        var b = rndint(0, 6);
+        generateMonster("ghost", a, b);
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(45, 49);
+        var b = rndint(1, 49);
+        generateMonster("ghost", a, b);
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(1, 49);
+        var b = rndint(45, 49);
+        generateMonster("ghost", a, b);
+    }
+    var a = rndint(11, 39);
+    var b = rndint(11, 39);
+    generateMonster("motherplant", a, b);
+    a = rndint(11, 39);
+    b = rndint(11, 39);
+    generateMonster("motherplant", a, b);
+    a = rndint(11, 39);
+    b = rndint(11, 39);
+    generateMonster("motherplant", a, b);
 
     for (let y = 5; y < 11; y++) {
         for (var x = 5; x < 11; x++) {
@@ -769,17 +769,17 @@ function logic(frame) {
             fow(); 
             if (px >= 0 && py >= 0 && px <= 8 && py <= 8) {
                 if (!game.fow[px][py]) {
-                	text("Тебя нашел еж!");
+                	// text("Тебя нашел еж!");
                     enemy.tax = game.pos.x;
                     enemy.tay = game.pos.y;
-                    text(enemy.tax+" "+enemy.tay);
-                    text(px+" "+py);
-                    text(game.pos.x+" "+game.pos.y);
+                    // text(enemy.tax+" "+enemy.tay);
+                    // text(px+" "+py);
+                    // text(game.pos.x+" "+game.pos.y);
                 }else{
-                	text("Еж тебя не видит!");
-                	text(enemy.tax+" "+enemy.tay);
-                    text(px+" "+py);
-                    text(game.pos.x+" "+game.pos.y);
+                	// text("Еж тебя не видит!");
+                	// text(enemy.tax+" "+enemy.tay);
+                 //    text(px+" "+py);
+                 //    text(game.pos.x+" "+game.pos.y);
                 }
             }
             if (enemy.alive){
@@ -859,17 +859,17 @@ function logic(frame) {
             			py = enemy.y - game.pos.y + 4;
 	                    if (px >= 0 && py >= 0 && px <= 8 && py <= 8) {
 	                        if (!game.fow[px][py]) {
-	                        	text("Тебя нашел еж после хода!");
+	                        	// text("Тебя нашел еж после хода!");
 	                            enemy.tax = game.pos.x;
 	                            enemy.tay = game.pos.y;
-	                            text(enemy.tax+" "+enemy.tay);
-	                            text(px+" "+py);
-	                            text(game.pos.x+" "+game.pos.y);
+	                            // text(enemy.tax+" "+enemy.tay);
+	                            // text(px+" "+py);
+	                            // text(game.pos.x+" "+game.pos.y);
 	                        }else{
-	                        	text("Еж тебя не видит после хода!");
-	                        	text(enemy.tax+" "+enemy.tay);
-	                            text(px+" "+py);
-	                            text(game.pos.x+" "+game.pos.y);
+	                        	// text("Еж тебя не видит после хода!");
+	                        	// text(enemy.tax+" "+enemy.tay);
+	                         //    text(px+" "+py);
+	                         //    text(game.pos.x+" "+game.pos.y);
 	                        }
 	                    }
 	                }
