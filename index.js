@@ -16,6 +16,7 @@ const item_speedpotion = {name: "speedpotion", text: "Это зелье уско
 
 
 const wound_bite = {name: "bite", text: "Серьезный укус, нужно забинтовать рану."};
+const wound_void = {name: "bruise", text: "Пустота поселилась в сердце героя, только радость может заполнить ее"};
 const wound_life = {name: "life", text: "Уголок сердца Героя, его можно заполнить болью и страданиями."};
 
 const item_burdock = {
@@ -26,6 +27,8 @@ const wound_drawn = {
     name: "drawn",
     text: "Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"
 };
+const item_bandage = {name: "bandage", text: "Бинт подойдет чтобы забинтовать рану"};
+
 
 const item_redkey = {name: "redkey", text: "Один из девяти ключей открывающих портал домой", typ: "key"};
 const item_goldenkey = {name: "goldenkey", text: "Один из девяти ключей открывающих портал домой", typ: "key"};
@@ -258,7 +261,11 @@ function newgame() {
         var a = rndint(5, 45);
         var b = rndint(5, 45);
         if (game.map[a][b][0] == "floor") {
-            generateMonster("hedgehog", a, b);
+            if(rndint(0, 1)){
+                generateMonster("hedgehog", a, b);
+            }else{
+                generateMonster("mummy", a, b);
+            }
         } else {
             generateMonster("fish", a, b);
         }
@@ -680,6 +687,20 @@ function logic(frame) {
                 enemyturn();
             }
         }
+        if (act === "bandage") {
+            var ok=true;
+            for (var i in game.inv) {
+                        if (game.wound[i].name == "bite" && ok) {
+                            game.wound[i] = wound_life;
+                            ok = false;
+                            text("Герой перебинтовал рану, ему стало лучше.");
+                            game.inv[game.select] = item_slot;
+                        }
+            }
+            if(ok){
+                text("У героя нет ран, которые можно перебинтовать.");
+            }
+        }
         if (act == "brick") {
             if (!(a == 0 && b == 0)) {
                 if (canMove(a, b)) {
@@ -724,14 +745,15 @@ function logic(frame) {
 
         function move(a, b, monster) {
             var wound = wound_bite;
-            var wound2 = false;
             var item = item_slot;
             if (monster.name == "plant") {
                 item = item_burdock;
             }
+            if (monster.name == "ghost" || monster.name == "mummy") {
+                    wound = wound_void;
+                }
             if (monster.name == "motherplant") {
-                wound = item_redburdock;
-                wound2 = wound_bite;
+                item = item_redburdock;
             }
 
             var nx = enemy.x + a;
@@ -755,9 +777,6 @@ function logic(frame) {
                 killEnemy(enemy.x, enemy.y);
                 addItem(item);
                 addWound(wound);
-                if (wound2 != false) {
-                    addWound(wound2);
-                }
             }
             if (game.map[enemy.x][enemy.y][0] == "trap") {
                 text("Кто-то попался в капкан");
@@ -842,11 +861,11 @@ function logic(frame) {
                             }
 
                         }
-                        if (enemy.name == "hedgehog" || enemy.name == "fish") {
-                            if (enemy.name == "hedgehog") {
-                                var fear = "water";
-                            } else {
+                        if (enemy.name == "hedgehog" || enemy.name == "fish" || enemy.name == "mummy") {
+                            if (enemy.name == "fish") {
                                 var fear = "floor";
+                            } else {
+                                var fear = "water";
                             }
                             var xmot = enemy.x - enemy.tax;
                             if (game.map[enemy.x - Math.sign(xmot)][enemy.y][1] != "empty" || game.map[enemy.x - Math.sign(xmot)][enemy.y][0] == fear) {
@@ -945,10 +964,11 @@ function killEnemy(x, y) {
         if (game.enemy[e].x == x && game.enemy[e].y == y) {
             game.enemy[e].alive = false;
             if(game.enemy[e].name=="hedgehog"){
-                if (game.map[game.enemy[e].x][game.enemy[e].y][2].typ != "key") {
-                    game.map[game.enemy[e].x][game.enemy[e].y][2] = item_spear;
-                }
+                createItem(game.enemy[e].x,game.enemy[e].y,item_spear);
             }
+            if(game.enemy[e].name=="mummy"){
+                            createItem(game.enemy[e].x,game.enemy[e].y,item_bandage);
+                        }
         }
     }
 }
@@ -1131,15 +1151,18 @@ function fow() {
                         if (x + y >= 8) {
                             game.fow[a + 1][b] = true
                         }
-                        ;
                         if (x + y <= 8) {
                             game.fow[a][b - 1] = true
                         }
-                        ;
                     }
                 }
             }
         }
+    }
+}
+function createItem(x,y,item){
+        if (game.map[x][y][2].typ != "key") {
+        game.map[x][y][2] = item;
     }
 }
 
