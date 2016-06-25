@@ -163,10 +163,10 @@ function init() {
         }
     }
     game.fow = [];
-    for (x = 0; x < 9; x++) {
+    for (x = -1; x < 10; x++) {
         game.fow[x] = [];
-        for (y = 0; y < 9; y++) {
-            game.fow[x][y] = false;
+        for (y = -1; y < 10; y++) {
+            game.fow[x][y] = true;
         }
     }
     for (var y = 6; y < 45; y++) {
@@ -330,19 +330,24 @@ function newgame() {
         game.inv[iv] = item_slot;
         game.wound[iv] = wound_life;
     }
-    game.inv[0] = item_spear;
-    game.inv[1] = item_pickaxe;
+//    game.inv[0] = item_spear;
+//    game.inv[1] = item_pickaxe;
     // game.inv[2] = item_pickaxe;
     // game.inv[3] = item_pickaxe;
     // game.inv[4] = item_pickaxe;
-    generateItem(item_brick);
-    generateItem(item_stay);
     // generateItem(item_spear);
-    for (var p = 0; p < 34; p++) {
+
+    for (var p = 0; p < 44; p++) {
         generateItem(item_pickaxe);
     }
     for (var p = 0; p < 14; p++) {
         generateItem(item_speedpotion);
+    }
+    for (var p = 0; p < 14; p++) {
+            generateItem(item_brick);
+        }
+    for (var p = 0; p < 14; p++) {
+        generateItem(item_stay);
     }
     generateItem(item_goldenkey);
     generateItem(item_whitekey);
@@ -665,9 +670,9 @@ function logic(frame) {
                         killEnemy(x + a * i, y + b * i);
                         text("Вы пронзили врага копьем!")
                         game.inv[game.select] = item_slot;
-                        if (game.map[x + a * i][y + b * i][2].typ != "key") {
-                            game.map[x + a * i][y + b * i][2] = item_spear;
-                        }
+//                        if (game.map[x + a * i][y + b * i][2].typ != "key") {
+//                            game.map[x + a * i][y + b * i][2] = item_spear;
+//                        }
                         ok = false;
                         // game.select = 0;
                     }
@@ -681,6 +686,7 @@ function logic(frame) {
                     text("Пожалуй приберегу несколько на строительство дома.");
                     game.map[x][y][1] = "wall";
                     action(a, b, "move");
+                    game.inv[game.select] = item_slot;
                 }
             } else {
                 text("Даже не хочу думать, что будет если съесть эти семена.");
@@ -696,6 +702,7 @@ function logic(frame) {
                         enemyInPos(x + a * i, y + b * i).name = "plant";
                         text("Даже поливать не нужно!");
                         ok = false;
+                        game.inv[game.select] = item_slot;
                         game.select = 0;
                     }
                 }
@@ -936,9 +943,12 @@ function logic(frame) {
 function killEnemy(x, y) {
     for (var e in game.enemy) {
         if (game.enemy[e].x == x && game.enemy[e].y == y) {
-            // game.enemy.splice(e, 1);
             game.enemy[e].alive = false;
-            // add_monster--;
+            if(game.enemy[e].name=="hedgehog"){
+                if (game.map[game.enemy[e].x][game.enemy[e].y][2].typ != "key") {
+                    game.map[game.enemy[e].x][game.enemy[e].y][2] = item_spear;
+                }
+            }
         }
     }
 }
