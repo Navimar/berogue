@@ -10,7 +10,7 @@ const item_brick = {
     name: "brick",
     text: "Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."
 };
-const item_stay = {name: "stay", text: "Палочка проростания, превращает в растение"};
+
 const item_pickaxe = {name: "pickaxe", text: "Кирка, крушит стены и черепа."};
 const item_speedpotion = {name: "speedpotion", text: "Это зелье ускорит вас в три раза, правда лишь на мгновение."}
 
@@ -156,9 +156,9 @@ window.onload = function () {
 
 function init() {
     game.map = [];
-    for (x = 0; x < 50; x++) {
+    for (x = -10; x < 60; x++) {
         game.map[x] = [];
-        for (y = 0; y < 50; y++) {
+        for (y = -10; y < 60; y++) {
             game.map[x][y] = [];
             for (z = 0; z < 3; z++) {
                 game.map[x][y][z] = "empty";
@@ -257,19 +257,24 @@ function newgame() {
     game.enemy = [];
 
     var ghosts = 15;
-    for (let j = 0; j < 90; j++) {
+    for (let j = 0; j < 45; j++) {
         var a = rndint(5, 45);
         var b = rndint(5, 45);
         if (game.map[a][b][0] == "floor") {
-            if(rndint(0, 1)){
-                generateMonster("hedgehog", a, b);
-            }else{
                 generateMonster("mummy", a, b);
-            }
         } else {
             generateMonster("fish", a, b);
         }
     }
+    for (let j = 0; j < 45; j++) {
+            var a = rndint(5, 45);
+            var b = rndint(5, 45);
+            if (game.map[a][b][0] == "floor") {
+                    generateMonster("hedgehog", a, b);
+            } else {
+                generateMonster("fish", a, b);
+            }
+        }
     for (let j = 0; j < ghosts; j++) {
         var a = rndint(0, 6);
         var b = rndint(1, 49);
@@ -353,9 +358,6 @@ function newgame() {
     for (var p = 0; p < 14; p++) {
             generateItem(item_brick);
         }
-    for (var p = 0; p < 14; p++) {
-        generateItem(item_stay);
-    }
     generateItem(item_goldenkey);
     generateItem(item_whitekey);
     generateItem(item_blackkey);
@@ -713,23 +715,7 @@ function logic(frame) {
                 text("Даже не хочу думать, что будет если съесть эти семена.");
             }
         }
-        if (act == "stay") {
-            if (a == 0 && b == 0) {
-                text("Я не хочу стать растением!")
-            } else {
-                var ok = true;
-                for (var i = 1; i < 5; i++) {
-                    if (enemyInPos(x + a * i, y + b * i) != 0 && ok) {
-                        enemyInPos(x + a * i, y + b * i).name = "plant";
-                        text("Даже поливать не нужно!");
-                        ok = false;
-                        game.inv[game.select] = item_slot;
-                        game.select = 0;
-                    }
-                }
-                // enemyturn();
-            }
-        }
+
         if (act == "speedpotion") {
             game.speedup += 3;
             text("Герой видит как все замедляется на его глазах");
