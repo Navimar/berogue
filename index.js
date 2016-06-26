@@ -616,16 +616,18 @@ function logic(frame) {
                         }
                     }
                 }
-                if (game.map[game.pos.x][game.pos.y][2] != "empty") {
-                    if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
-                        for (k in allKeys) {
-                            if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
-                                allKeys.splice(k, 1);
+                if (a==0 && b==0){
+                    if (game.map[game.pos.x][game.pos.y][2] != "empty") {
+                        if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
+                            for (k in allKeys) {
+                                if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
+                                    allKeys.splice(k, 1);
+                                }
                             }
                         }
+                        addItem(game.map[game.pos.x][game.pos.y][2], true);
+                        game.map[game.pos.x][game.pos.y][2] = "empty";
                     }
-                    addItem(game.map[game.pos.x][game.pos.y][2], true);
-                    game.map[game.pos.x][game.pos.y][2] = "empty";
                 }
                 enemyturn();
                 justmoved = true;
