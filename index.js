@@ -16,7 +16,8 @@ const item_pickaxe = {name: "pickaxe", text: "Кирка, крушит стен�
 const item_speedpotion = {name: "speedpotion", text: "Это зелье ускорит героя в три раза, правда лишь на мгновение."};
 const item_funpotion = {name: "funpotion", text: "Это зелье наполняет радостью и придает смысл жизни."};
 const item_bottle = {name: "bottle", text: "Пустая склянка, подойдет чтобы налить туда любую жидкость."};
-const item_meat = {name: "item_meat", text: "Сырое мясо, очень рекомендую пожарить прежде чем есть, ведь в нем могут быть паразиты!"};
+const item_meat = {name: "meat", text: "Сырое мясо, очень рекомендую пожарить прежде чем есть, ведь в нем могут быть паразиты!"};
+const item_flinders = {name: "flinders", text: "Щепки, подойдут разве что для розжига или как наполнитель, путного из них точно ничего не выйдет."};
 
 
 const wound_bite = {name: "bite", text: "Серьезный укус, нужно забинтовать рану."};
@@ -630,6 +631,7 @@ function logic(frame) {
     function action(a, b, act) {
         var x = game.pos.x;
         var y = game.pos.y;
+        var here = game.map[x + a][y + b];
 
         if (act === "move") {
             if (canMove(a, b)) {
@@ -677,18 +679,40 @@ function logic(frame) {
         }
         if (act === "pickaxe") {
             if (game.map[game.pos.x + a][game.pos.y + b][1] == "wall" || enemyInPos(game.pos.x + a, game.pos.y + b) != false) {
+                if (here[1] == "wall"){game.map[game.pos.x + a][game.pos.y + b][2] = item_stone;}
                 game.map[game.pos.x + a][game.pos.y + b][1] = "empty";
-                game.map[game.pos.x + a][game.pos.y + b][2] = item_stone;
                 killEnemy(game.pos.x + a, game.pos.y + b);
                 text("Ломай, убивай!!!");
                 game.inv[game.select] = item_stick;
-                game.select = 0;
+                // game.select = 0;
                 enemyturn();
             } else {
                 text("Цыньк!");
                 if (a == 0 && b == 0) {
                     text("Кирка едва годится вместо зубочистки..");
                 }
+            }
+        }
+        if (act ==="stick"){
+         if(here[1]=="empty" && enemyInPos(x + a, y + b) == false){
+             here[2] = item_stick;
+             game.inv[game.select] = item_slot;
+         }else{
+             killEnemy(x + a,y + b);
+             game.inv[game.select] = item_flinders;
+             text("Палка разлетелась на щепки!")
+         }
+        }
+        if (act ==="flinders"){
+            if(here[1]=="empty" && enemyInPos(x + a, y + b) == false){
+                here[2] = item_flinders;
+                game.inv[game.select] = item_slot;
+            }
+        }
+        if (act ==="bottle"){
+            if(here[1]=="empty" && enemyInPos(x + a, y + b) == false){
+                here[2] = item_bottle;
+                game.inv[game.select] = item_slot;
             }
         }
         if (act === "burdock") {
