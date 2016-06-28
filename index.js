@@ -19,6 +19,7 @@ const item_pickaxe = {name: "pickaxe", text: "Кирка, крушит стен�
 const item_speedpotion = {name: "speedpotion", text: "Это зелье ускорит героя в три раза, правда лишь на мгновение."};
 const item_funpotion = {name: "funpotion", text: "Это зелье наполняет радостью и придает смысл жизни."};
 const item_bottle = {name: "bottle", text: "Пустая склянка, подойдет чтобы налить туда любую жидкость."};
+const item_brokenglass = {name: "brokenglass", text: "Битое стекло, лучше по не ходить..."};
 const item_meat = {
     name: "meat",
     text: "Сырое мясо, очень рекомендую пожарить прежде чем есть, ведь в нем могут быть паразиты!"
@@ -202,7 +203,6 @@ window.onload = function () {
 }
 
 function init() {
-    funaddict = false;
     game.map = [];
     for (x = -10; x < 60; x++) {
         game.map[x] = [];
@@ -220,13 +220,6 @@ function init() {
             game.fow[x][y] = true;
         }
     }
-    for (var y = 6; y < 45; y++) {
-        for (var x = 6; x < 45; x++) {
-            rndItem[rndItemCounter] = {a: x, b: y};
-            rndItemCounter++;
-        }
-    }
-
     return newgame();
 }
 
@@ -237,9 +230,15 @@ function generateMonster(name, x, y) {
 
 function newgame() {
     gameovered = false;
+    funaddict = false;
     add_monster = 0;
     game.speedup = 0;
+    rndItemCounter = 0;
     allKeys = [];
+
+
+
+
     for (var y = 0; y < 50; y++) {
         for (var x = 0; x < 50; x++) {
             for (var z = 0; z < 3; z++) {
@@ -373,10 +372,10 @@ function newgame() {
     var emptyarr = [{x: a, y: b}, {x: a - 1, y: b - 1}, {x: a - 1, y: b}, {x: a - 1, y: b + 1}, {
         x: a,
         y: b - 1
-    }, , {x: a, y: b + 1}, {x: a + 1, y: b - 1}, {x: a + 1, y: b}, {x: a + 1, y: b + 1}, {x: a, y: b + 2}, {
+    }, {x: a, y: b + 1}, {x: a + 1, y: b - 1}, {x: a + 1, y: b}, {x: a + 1, y: b + 1}, {x: a, y: b + 2}, {
         x: a,
         y: b + 3
-    }, , {x: a - 3, y: b}, {x: a - 2, y: b}, {x: a, y: b - 2}, {x: a, y: b - 3}, {x: a + 2, y: b}, {x: a + 3, y: b}];
+    }, {x: a - 3, y: b}, {x: a - 2, y: b}, {x: a, y: b - 2}, {x: a, y: b - 3}, {x: a + 2, y: b}, {x: a + 3, y: b}];
     for (w in emptyarr) {
         killEnemy(emptyarr[w].x, emptyarr[w].y);
     }
@@ -386,6 +385,14 @@ function newgame() {
     game.select = 0;
     game.inv = [];
     game.wound = [];
+
+    for (var y = 6; y < 45; y++) {
+        for (var x = 6; x < 45; x++) {
+            rndItem[rndItemCounter] = {a: x, b: y};
+            rndItemCounter++;
+        }
+    }
+
     for (var iv = 0; iv < vision; iv++) {
         game.inv[iv] = item_slot;
         game.wound[iv] = wound_life;
@@ -416,7 +423,7 @@ function newgame() {
         var m = rndint(0, rndItem.length);
         var a = rndItem[m].a;
         var b = rndItem[m].b;
-        rndItem[m].splice;
+        rndItem.splice(m, 1);
         game.map[a][b][2] = item;
         if (item.typ == "key") {
             allKeys[allKeys.length] = {x: a, y: b, name: item.name};
@@ -680,36 +687,39 @@ function logic(frame) {
                         }
                     }
                 }
-                if(addItem(game.map[game.pos.x][game.pos.y][2], true)){
+                if (addItem(game.map[game.pos.x][game.pos.y][2], true)) {
                     game.map[game.pos.x][game.pos.y][2] = "empty";
                     // enemyturn();
-                }else{
+                } else {
                     text("Герой не может нести больше вещей!");
                 }
             }
         }
         if (act === "pickaxe") {
-            if (game.map[game.pos.x + a][game.pos.y + b][1] == "wall" || enemyInPos(game.pos.x + a, game.pos.y + b) != false) {
-                if (here[1] == "wall") {
-                    game.map[game.pos.x + a][game.pos.y + b][1] = "empty";
-                    drop(x + a, y + b, item_stone);
-                }
-                killEnemy(game.pos.x + a, game.pos.y + b);
+            if (here[1] == "wall") {
+                game.map[game.pos.x + a][game.pos.y + b][1] = "empty";
+                drop(x + a, y + b, item_stone);
+                game.inv[game.select] = item_stick;
+            }
+            if (enemyInPos(x + a, y + b)) {
+                killEnemy(x + a, y + b);
                 text("Ломай, убивай!!!");
                 game.inv[game.select] = item_stick;
-                // game.select = 0;
+            }
+            if (here[2] == item_funpotion || here[2] == item_speedpotion || here[2] == item_bottle) {
+                here[2] = item_brokenglass;
+
                 enemyturn();
-            } else {
-                text("Цыньк!");
-                if (a == 0 && b == 0) {
-                    text("Кирка едва годится вместо зубочистки..");
-                }
             }
         }
         if (act === "stick") {
-            if (here[1] == "empty" && enemyInPos(x + a, y + b) == false) {
-                here[2] = item_stick;
+            if (here[2] == item_funpotion || here[2] == item_speedpotion || here[2] == item_bottle) {
+                here[2] = item_brokenglass;
+                enemyturn();
+            } else if (here[1] == "empty" && enemyInPos(x + a, y + b) == false) {
+                drop(x + a, y + b, item_stick);
                 game.inv[game.select] = item_slot;
+                text("Герой разбил бутылку в дребезги!");
             } else {
                 killEnemy(x + a, y + b);
                 game.inv[game.select] = item_slot;
@@ -717,6 +727,7 @@ function logic(frame) {
                 text("Палка разлетелась на щепки!");
                 enemyturn();
             }
+
         }
         if (act === "flinders") {
             if (here[1] == "empty" && enemyInPos(x + a, y + b) == false) {
