@@ -116,7 +116,7 @@ window.onkeydown = function (e) {
         cmd = {tp: "move", dir: "sleep"};
     }
     if (e.code == "Enter") {
-        cmd = {tp: "restart"};
+        cmd = {tp: "pick", dir: "sleep"};
     }
     if (e.code == "Digit1") {
         game.select = 0;
@@ -380,7 +380,7 @@ function newgame() {
     for (w in emptyarr) {
         killEnemy(emptyarr[w].x, emptyarr[w].y);
     }
-    text("Началась новая игра. WASD чтобы ходить. Цифры, чтобы выбирать предметы. Стрелки чтобы использовать предметы. SPACE чтобы стоять на месте")
+    text("Началась новая игра. WASD чтобы ходить. ENTER чтобы подбирать предметы, Цифры, чтобы выбирать предметы в инветаре. Стрелки чтобы использовать предметы. SPACE чтобы стоять на месте")
     fow();
 
     game.select = 0;
@@ -390,7 +390,7 @@ function newgame() {
         game.inv[iv] = item_slot;
         game.wound[iv] = wound_life;
     }
-   game.inv[0] = item_pickaxe;
+    game.inv[0] = item_pickaxe;
 
     for (var p = 0; p < 44; p++) {
         generateItem(item_pickaxe);
@@ -570,8 +570,12 @@ function logic(frame) {
         let act = null;
         if (cmd.tp == "use") {
             act = game.inv[game.select].name;
-        } else if (cmd.tp == "move") {
+        }
+        if (cmd.tp == "move") {
             act = "move";
+        }
+        if (cmd.tp == "pick") {
+            act = "pick";
         }
         if (cmd.dir == "left") {
             action(-1, 0, act);
@@ -589,7 +593,7 @@ function logic(frame) {
             action(0, 0, act);
         }
     } else {
-        if (cmd.tp == "restart") {
+        if (cmd.tp == "pick") {
             newgame(game);
         }
     }
@@ -661,24 +665,27 @@ function logic(frame) {
                         }
                     }
                 }
-                if (a == 0 && b == 0) {
-                    if (game.map[game.pos.x][game.pos.y][2] != "empty") {
-                        if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
-                            for (k in allKeys) {
-                                if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
-                                    allKeys.splice(k, 1);
-                                }
-                            }
-                        }
-                        addItem(game.map[game.pos.x][game.pos.y][2], true);
-                        game.map[game.pos.x][game.pos.y][2] = "empty";
-                    } else {
-                        enemyturn();
-                    }
-                } else {
-                    enemyturn();
-                }
+
+                enemyturn();
+
                 justmoved = true;
+            }
+        }
+        if (act === "pick") {
+            if (game.map[game.pos.x][game.pos.y][2] != "empty") {
+                if (game.map[game.pos.x][game.pos.y][2].typ == "key") {
+                    for (k in allKeys) {
+                        if (allKeys[k].name == game.map[game.pos.x][game.pos.y][2].name) {
+                            allKeys.splice(k, 1);
+                        }
+                    }
+                }
+                if(addItem(game.map[game.pos.x][game.pos.y][2], true)){
+                    game.map[game.pos.x][game.pos.y][2] = "empty";
+                    // enemyturn();
+                }else{
+                    text("Герой не может нести больше вещей!");
+                }
             }
         }
         if (act === "pickaxe") {
@@ -706,7 +713,7 @@ function logic(frame) {
             } else {
                 killEnemy(x + a, y + b);
                 game.inv[game.select] = item_slot;
-                drop(x,y,item_flinders);
+                drop(x, y, item_flinders);
                 text("Палка разлетелась на щепки!");
                 enemyturn();
             }
@@ -785,20 +792,20 @@ function logic(frame) {
             }
         }
         if (act === "funpotion") {
-            var ok =true;
+            var ok = true;
             funaddict = true;
             for (var i in game.inv) {
-                if (game.wound[i].name == "void" ||game.wound[i].name == "notfun") {
+                if (game.wound[i].name == "void" || game.wound[i].name == "notfun") {
                     game.wound[i] = wound_life;
                     game.inv[game.select] = item_slot;
-                    ok =false;
+                    ok = false;
                 }
             }
             if (ok) {
                 text("Герой не видит причин пить это, он же не алкаш какой-нибудь.");
-            }else{
+            } else {
                 text("Герой повеселел, хорошее зелье может поборать любой недуг.");
-                drop(x,y,item_bottle);
+                drop(x, y, item_bottle);
             }
         }
         if (act == "brick") {
@@ -817,7 +824,7 @@ function logic(frame) {
         if (act == "speedpotion") {
             game.speedup += 3;
             text("Герой видит как все замедляется на его глазах");
-            drop(x,y,item_bottle);
+            drop(x, y, item_bottle);
             game.inv[game.select] = item_slot;
         }
         key = false;
@@ -1075,7 +1082,7 @@ function drop(x, y, item) {
     var ok = false;
     var mass = [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1], [2, 0], [-2, 0], [0, -2], [0, 2]];
     for (var r = 0; r < mass.length; r++) {
-        if(!ok){
+        if (!ok) {
             if (game.map[x + a][y + b][2] == "empty" && game.map[x + a][y + b][1] == "empty") {
                 game.map[x + a][y + b][2] = item;
                 ok = true;
@@ -1145,9 +1152,10 @@ function addItem(item) {
             }
         }
         if (ok) {
-            text("Герой не может вынести большего груза артефактов...");
+            return false;
         }
     }
+    return true;
 }
 
 function fow() {
