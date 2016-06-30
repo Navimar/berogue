@@ -1,9 +1,6 @@
 const grafio = initGrafio();
 
-const item_slot = {
-    name: "slot",
-    text: "Мешочек, его можно заполнить полезными предметами."
-};
+const item_slot = {name: "slot", text: "Мешочек, его можно заполнить полезными предметами."};
 
 const item_stone = {
     name: "stone",
@@ -14,7 +11,6 @@ const item_brick = {
     text: "Семена стеницы, уроните семечко у себя за спиной и там выростет настоящая стена."
 };
 const item_stick = {name: "stick", text: "Палка, хорошо подходит, чтобы что-нибудь сломать"};
-
 const item_pickaxe = {name: "pickaxe", text: "Кирка, крушит стены и черепа."};
 const item_speedpotion = {name: "speedpotion", text: "Это зелье ускорит героя в три раза, правда лишь на мгновение."};
 const item_funpotion = {name: "funpotion", text: "Это зелье наполняет радостью и придает смысл жизни."};
@@ -30,6 +26,7 @@ const item_flinders = {
     name: "flinders",
     text: "Щепки, подойдут разве что для розжига или как наполнитель, путного из них точно ничего не выйдет."
 };
+const item_ash = {name: "ash", text: "Уголек"};
 
 
 const wound_bite = {name: "bite", text: "Серьезный укус, нужно забинтовать рану."};
@@ -39,6 +36,12 @@ const wound_notfun = {
     name: "notfun",
     text: "Ваш герой изрядно соскучился по веселящему зелью и это причиняет боль. И да, он не признает зависимости."
 };
+const wound_hungry = {name: "hungry", text: "Герой так голоден что готов проглотить кота!"};
+const wound_helminth = {
+    name: "helminth",
+    text: "У героя поселились паразиты, теперь он слабее и у него хуже усваивается пища"
+};
+
 
 const item_burdock = {
     name: "burdock", text: "Пристал репей, не думаю что стоит бросать его на землю..."
@@ -49,7 +52,7 @@ const wound_drawn = {
     text: "Тухлая вода залилась за шиворот и в карманы, нужно срочно на сушу!"
 };
 const item_bandage = {name: "bandage", text: "Бинт подойдет чтобы забинтовать рану"};
-
+const item_grill = {name: "grill", text: "Бинт подойдет чтобы забинтовать рану"};
 const item_redkey = {name: "redkey", text: "Один из девяти ключей открывающих портал домой", typ: "key"};
 const item_goldenkey = {name: "goldenkey", text: "Один из девяти ключей открывающих портал домой", typ: "key"};
 const item_whitekey = {name: "whitekey", text: "Один из девяти ключей открывающих портал домой", typ: "key"};
@@ -73,7 +76,9 @@ var rndItem = [];
 var rndItemCounter = 0;
 var funaddict = false;
 var funless = 0;
+var starve = 0;
 var fires = [];
+var helminth = false;
 
 var stamp = 0;
 var cmd = null;
@@ -233,11 +238,14 @@ function generateMonster(name, x, y) {
 function newgame() {
     gameovered = false;
     funaddict = false;
+    funless = 0;
+    starve = 0;
     add_monster = 0;
     game.speedup = 0;
     rndItemCounter = 0;
     allKeys = [];
     fires = [];
+    helminth = false;
 
     for (var y = 0; y < 50; y++) {
         for (var x = 0; x < 50; x++) {
@@ -285,45 +293,45 @@ function newgame() {
 
     game.enemy = [];
 
-    // var ghosts = 15;
-    // for (let j = 0; j < 45; j++) {
-    //     var a = rndint(5, 45);
-    //     var b = rndint(5, 45);
-    //     if (game.map[a][b][0] == "floor") {
-    //         generateMonster("mummy", a, b);
-    //     } else {
-    //         generateMonster("fish", a, b);
-    //     }
-    // }
-    // for (let j = 0; j < 45; j++) {
-    //     var a = rndint(5, 45);
-    //     var b = rndint(5, 45);
-    //     if (game.map[a][b][0] == "floor") {
-    //         generateMonster("hedgehog", a, b);
-    //     } else {
-    //         generateMonster("fish", a, b);
-    //     }
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(0, 6);
-    //     var b = rndint(1, 49);
-    //     generateMonster("ghost", a, b);
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(1, 49);
-    //     var b = rndint(0, 6);
-    //     generateMonster("ghost", a, b);
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(45, 49);
-    //     var b = rndint(1, 49);
-    //     generateMonster("ghost", a, b);
-    // }
-    // for (let j = 0; j < ghosts; j++) {
-    //     var a = rndint(1, 49);
-    //     var b = rndint(45, 49);
-    //     generateMonster("ghost", a, b);
-    // }
+    var ghosts = 15;
+    for (let j = 0; j < 45; j++) {
+        var a = rndint(5, 45);
+        var b = rndint(5, 45);
+        if (game.map[a][b][0] == "floor") {
+            generateMonster("mummy", a, b);
+        } else {
+            generateMonster("fish", a, b);
+        }
+    }
+    for (let j = 0; j < 45; j++) {
+        var a = rndint(5, 45);
+        var b = rndint(5, 45);
+        if (game.map[a][b][0] == "floor") {
+            generateMonster("hedgehog", a, b);
+        } else {
+            generateMonster("fish", a, b);
+        }
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(0, 6);
+        var b = rndint(1, 49);
+        generateMonster("ghost", a, b);
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(1, 49);
+        var b = rndint(0, 6);
+        generateMonster("ghost", a, b);
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(45, 49);
+        var b = rndint(1, 49);
+        generateMonster("ghost", a, b);
+    }
+    for (let j = 0; j < ghosts; j++) {
+        var a = rndint(1, 49);
+        var b = rndint(45, 49);
+        generateMonster("ghost", a, b);
+    }
     var a = rndint(11, 39);
     var b = rndint(11, 39);
     generateMonster("motherplant", a, b);
@@ -701,6 +709,10 @@ function logic(frame) {
             if (here[2] == item_funpotion || here[2] == item_speedpotion || here[2] == item_bottle) {
                 here[2] = item_brokenglass;
             }
+            if (here[2] == item_fireberry) {
+                fire(x + a, y + b, 2, 1);
+                here[2] = "empty";
+            }
             enemyturn();
         }
         if (act === "stick") {
@@ -744,19 +756,53 @@ function logic(frame) {
         }
         if (act === "fireberry") {
             if (here[2] == item_flinders) {
-                fire(x + a, y + b, 1);
+                fire(x + a, y + b, 3, 2);
                 game.inv[game.select] = item_slot;
+                here[2] = "empty";
             } else {
                 drop(x, y, item_fireberry);
                 game.inv[game.select] = item_slot;
             }
+            enemyturn();
         }
 
         if (act === "meat") {
-            if (here[1] == "empty" && enemyInPos(x + a, y + b) == false) {
-                here[2] = item_meat;
-                game.inv[game.select] = item_slot;
+            if (fireInPos(x + a, y + b)) {
+                game.inv[game.select] = item_grill;
+
+            } else {
+                var ok = true;
+                for (var i in game.wound) {
+                    if (game.wound[i] == wound_hungry && ok) {
+                        game.wound[i] = wound_life;
+                        ok = false;
+                        text("Герой поел, ему стало лучше.");
+                        game.inv[game.select] = item_slot;
+                    }
+                }
+                if (!helminth) {
+                    addWound(wound_helminth);
+                    helminth = true;
+                }
             }
+            enemyturn();
+        }
+        if (act === "grill") {
+            if (fireInPos(x + a, y + b)) {
+                game.inv[game.select] = item_slot;
+                fire(x + a, x + b, 1, 1);
+            } else {
+                var ok = true;
+                for (var i in game.wound) {
+                    if (game.wound[i] == wound_hungry && ok) {
+                        game.wound[i] = wound_life;
+                        ok = false;
+                        text("Герой поел, ему стало лучше.");
+                        game.inv[game.select] = item_slot;
+                    }
+                }
+            }
+            enemyturn();
         }
         if (act === "burdock") {
             if (game.map[game.pos.x + a][game.pos.y + b][1] == "empty" && (a != 0 || b != 0)) {
@@ -788,12 +834,17 @@ function logic(frame) {
                 var ok = true;
                 for (var i = 1; i < 5; i++) {
                     if (enemyInPos(x + a * i, y + b * i) != 0 && ok) {
-                        drop(x + a * i, y + b * i, item_flinders);
+                        drop(x + a * i, y + b * i, item_ash);
                         killEnemy(x + a * i, y + b * i);
                         text("Вы пронзили врага копьем!");
                         game.inv[game.select] = item_slot;
                         ok = false;
                         // game.select = 0;
+                    }
+                    if ((game.map[x + a * (i + 1)][y + b * (i + 1)][1] != "empty" || i == 4) && ok) {
+                        drop(x + a * i, y + b * i, item_stone);
+                        game.inv[game.select] = item_slot;
+                        ok = false;
                     }
                 }
                 enemyturn();
@@ -816,7 +867,13 @@ function logic(frame) {
         if (act === "funpotion") {
             var ok = true;
             funaddict = true;
-            for (var i in game.inv) {
+            if (here[1] == "gusstation") {
+                game.inv[game.select] = item_molotov;
+            }
+            if (here[1] == "wall") {
+                drop(x, y, item_brokenglass);
+                game.inv[game.select] = item_slot;
+            } else for (var i in game.inv) {
                 if (game.wound[i].name == "void" || game.wound[i].name == "notfun") {
                     game.wound[i] = wound_life;
                     game.inv[game.select] = item_slot;
@@ -844,16 +901,39 @@ function logic(frame) {
         }
 
         if (act == "speedpotion") {
-            game.speedup += 3;
-            text("Герой видит как все замедляется на его глазах");
-            drop(x, y, item_bottle);
-            game.inv[game.select] = item_slot;
+            if (here[1] == "gusstation") {
+                game.inv[game.select] = item_molotov;
+            }
+            if (here[1] == "wall") {
+                drop(x, y, item_brokenglass);
+                game.inv[game.select] = item_slot;
+            } else {
+                game.speedup += 3;
+                text("Герой видит как все замедляется на его глазах");
+                drop(x, y, item_bottle);
+                game.inv[game.select] = item_slot;
+            }
         }
         key = false;
         // return "none";
     }
 
     function enemyturn() {
+        for (f in fires) {
+            if (enemyInPos(fires[f].x, fires[f].y)) {
+                killEnemy(fires[f].x, fires[f].y, "fire");
+            }
+        }
+        for (f in fires) {
+            fires[f].duration -= 1;
+            text(f + " " + fires[f].mass);
+            if (fires[f].duration == 0) {
+                for (var c = 0; c < fires[f].mass; c++) {
+                    drop(fires[f].x, fires[f].y, item_ash);
+                }
+                fires.splice(f, 1);
+            }
+        }
         killNotAlive();
         if (funaddict) {
             funless++;
@@ -863,11 +943,15 @@ function logic(frame) {
                 text("Что-то кошки на душе скребут...")
             }
         }
-        // for (f in fires) {
-        //     if (fires[f].duration == 0){
-        //         // fires.splice(f,1);
-        //     } else {  f.duration -= 1;}
-        // }
+        starve++;
+        var lvl = 40;
+        if (helminth) {
+            lvl = 25;
+        }
+        if (starve >= lvl) {
+            starve = 0;
+            addWound(wound_hungry);
+        }
 
 
         function move(a, b, monster) {
@@ -995,11 +1079,11 @@ function logic(frame) {
                                 var fear = "water";
                             }
                             var xmot = enemy.x - enemy.tax;
-                            if (game.map[enemy.x - Math.sign(xmot)][enemy.y][1] != "empty" || game.map[enemy.x - Math.sign(xmot)][enemy.y][0] == fear) {
+                            if (game.map[enemy.x - Math.sign(xmot)][enemy.y][1] != "empty" || game.map[enemy.x - Math.sign(xmot)][enemy.y][0] == fear || fireInPos(enemy.x - Math.sign(xmot), enemy.y)) {
                                 xmot = 0;
                             }
                             var ymot = enemy.y - enemy.tay;
-                            if (game.map[enemy.x][enemy.y - Math.sign(ymot)][1] != "empty" || game.map[enemy.x][enemy.y - Math.sign(ymot)][0] == fear) {
+                            if (game.map[enemy.x][enemy.y - Math.sign(ymot)][1] != "empty" || game.map[enemy.x][enemy.y - Math.sign(ymot)][0] == fear || fireInPos(enemy.x, enemy.y - Math.sign(ymot))) {
                                 ymot = 0;
                             }
                             if (Math.abs(xmot) < 6 && Math.abs(ymot) < 6) {
@@ -1085,31 +1169,42 @@ function logic(frame) {
     text("--------------");
 }
 
-function killEnemy(x, y) {
+function killEnemy(x, y, wound) {
     for (var e in game.enemy) {
         if (game.enemy[e].x == x && game.enemy[e].y == y) {
             game.enemy[e].alive = false;
             if (game.enemy[e].name == "hedgehog") {
-                drop(game.enemy[e].x, game.enemy[e].y, item_meat);
+                if (!wound) {
+                    drop(game.enemy[e].x, game.enemy[e].y, item_meat);
+                }
+                if (wound == "fire") {
+                    drop(game.enemy[e].x, game.enemy[e].y, item_grill);
+                }
             }
+
             if (game.enemy[e].name == "mummy") {
-                drop(game.enemy[e].x, game.enemy[e].y, item_bandage);
+                if (!wound) {
+                    drop(game.enemy[e].x, game.enemy[e].y, item_bandage);
+                }
+                if (wound == "fire") {
+                    fire(x, y, 3, 1);
+                }
             }
         }
     }
 }
-function fire(x, y, d) {
+function fire(x, y, d, m) {
     var ok = true;
     for (f of fires) {
         if (f.x == x && f.y == y) {
             f.duration += d;
+            f.mass += m;
             ok = false;
         }
     }
     if (ok) {
-        text("new fire "+fires.length);
-        fires[fires.length] = {x: x, y: y, duration: d};
-        console.log(fires);
+        fires[fires.length] = {x: x, y: y, duration: d, mass: m};
+        text(fires[fires.length - 1].mass);
     }
 }
 
@@ -1156,6 +1251,16 @@ function text(string) {
 function enemyInPos(x, y) {
     var r = 0;
     for (var e of game.enemy) {
+        if (e.x == x && e.y == y) {
+            r = e;
+        }
+    }
+    return r;
+}
+
+function fireInPos(x, y) {
+    var r = 0;
+    for (var e of fires) {
         if (e.x == x && e.y == y) {
             r = e;
         }
