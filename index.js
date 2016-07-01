@@ -398,7 +398,7 @@ function newgame() {
         generateItem(item_speedpotion);
     }
     for (var p = 0; p < 14; p++) {
-        generateItem(item_brick);
+        // generateItem(item_brick);
         generateItem(item_funpotion);
     }
     generateItem(item_goldenkey);
